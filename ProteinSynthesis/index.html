@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+		<title>Protein Synthesis/Decay Sim</title> 
+    <script src="../jquery.js"></script>
+    <script src="utils.js"></script>
+    <script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+    <link rel='stylesheet' href='bootstrap/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='css.css' />
+		<style type="text/css">
+    </style>
+	</head> 
+	<body class="ui-droppable" style="cursor: auto;"> 
+
+    <div class="allContainer">
+      <div class="title">
+        <img src="img/logo.png" alt="logo"/>
+        <h1 class='text-right'>Numerical Analysis of Gene Regulatory Network Protein Synthesis and Decay</h1>
+      </div>
+      <h3 class="parameters-label section-expand">+ Parameters</h3 >
+      <div class="all-parameters" style='display:none;'>
+        
+        
+        
+        <!-- ******************* ROW 0 ******************* -->
+        
+        
+        
+        <div class="parameter-section-row">
+          <!-- Gas -->
+          <div class="parameter-section">
+            <p class="section-collapse">&#45; Gas Protein synthesis parameters</p>
+            <div class='parameter-control-container'>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Half-life:</span>
+                <div class="input-group">
+                  <input id="GasProteinHalfLifeInput" type="text" class="form-control" placeholder="20"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Promoter Strength:</span>
+                <div class="input-group">
+                <input id="GasProteinStrengthInput" type="text" class="form-control" placeholder="1"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Protein Size Factor:</span>
+                <div class="input-group">
+                <input id="GasProteinSizeInput" type="text" class="form-control" placeholder="4"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Turn-off threshold:</span>
+                <div class="input-group">
+                <input id="GasProteinThresholdInput" type="text" class="form-control" placeholder="25"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Turn-off sensitivity:</span>
+                <div class="input-group">
+                <input id="GasProteinSensitivityInput" type="text" class="form-control" placeholder="3"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <li class="divider"></li>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Gas Prod factor:</span>
+                <div class="input-group">
+                <input id="GasProductionInput" type="text" class="form-control" placeholder="1"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Gas Diffusion rates:</span>
+                <div class="input-group">
+                <input id="GasDiffusionInput" type="text" class="form-control" placeholder="39.5"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <button id="bttnGraphGasRate" type="button" class="btn btn-default">Graph</button>
+              </div>
+              <div class='graph-container'>
+                <p class="section-collapse"> &#45; Rate of gas as a function of Gas Protein</p>
+                <div  id='gas-rate-graph' class='rate-graph'>
+                </div>
+                <p class="section-collapse"> &#45; Rate of Gas Protein as a function of Repressor</p>
+                <div  id='gas-protein-rate-graph' class='rate-graph'>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Repressor -->
+          <div class="parameter-section">
+            <p class="section-collapse">&#45; Repressor synthesis parameters</p>
+            <div class='parameter-control-container'>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Half-life:</span>
+                <div class="input-group">
+                  <input id="RepressorHalfLifeInput" type="text" class="form-control" placeholder="20"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Promoter Strength:</span>
+                <div class="input-group">
+                <input id="RepressorStrengthInput" type="text" class="form-control" placeholder="4"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Protein Size Factor:</span>
+                <div class="input-group">
+                <input id="RepressorSizeInput" type="text" class="form-control" placeholder="1"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Turn-off threshold:</span>
+                <div class="input-group">
+                <input id="RepressorThresholdInput" type="text" class="form-control" placeholder="25"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Turn-off sensitivity:</span>
+                <div class="input-group">
+                <input id="RepressorSensitivityInput" type="text" class="form-control" placeholder="3"> </input><span class="input-group-addon">units</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <button id="bttnGraphRepRate" type="button" class="btn btn-default">Graph</button>
+              </div>
+              <div class='graph-container'>
+                <p class="section-collapse"> &#45; Rate of Repressor as a function of Gas</p>
+                <div  id='rep-rate-graph' class='rate-graph'>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- AHLR -->
+          <div class="parameter-section">
+          <p class="section-collapse"> &#45; AHLR synthesis parameters</p>
+          <div class='parameter-control-container'>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Half-life:</span>
+              <div class="input-group">
+                <input  id="AhlrHalfLifeInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Promoter Strength:</span>
+              <div class="input-group">
+              <input  id="AhlrStrengthInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Protein Size Factor:</span>
+              <div class="input-group">
+              <input id="AhlrSizeInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Turn-off threshold:</span>
+              <div class="input-group">
+              <input id="AhlrThresholdInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Turn-off sensitivity:</span>
+              <div class="input-group">
+              <input id="AhlrSensitivityInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+        
+        
+        
+        <!-- ******************* ROW 1 ******************* -->
+        
+        
+        
+        <div class="parameter-section-row">
+        <!-- Algorithmic -->
+          <div class="parameter-section">
+            <p class="section-expand">&#43; Algorithmic Parameters</p>
+            <div class='parameter-control-container' style='display: none;'>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Delta Time:</span>
+                <div class="input-group">
+                  <input id="DeltaTimeInput" type="text" class="form-control" placeholder="0.125"> </input><span class="input-group-addon">min</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Data-to-Graph Ratio:</span>
+                <div class="input-group">
+                <input id='DataToGraphPointRatioInput' type="text" class="form-control" placeholder="3"> </input><span class="input-group-addon">N/A</span>
+                </div>
+              </div>
+              <div class='parameter-control'>
+                <span class="parameter-control-label">Data size:</span>
+                <div class="input-group">
+                <input id="DataSizeInput" type="text" class="form-control" placeholder="3200"> </input><span class="input-group-addon">N/A</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Empty place holders TODO: Move beofre algo -->
+          <div class="parameter-section">
+            <p class="section-collapse"> - AHL Parameters</p>
+            <div class='parameter-control-container'>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Half-life:</span>
+              <div class="input-group">
+                <input  id="AhlHalfLifeInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Promoter Strength:</span>
+              <div class="input-group">
+              <input  id="AhlStrengthInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Protein Size Factor:</span>
+              <div class="input-group">
+              <input id="AhlSizeInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Turn-off threshold:</span>
+              <div class="input-group">
+              <input id="AhlThresholdInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+            <div class='parameter-control'>
+              <span class="parameter-control-label">Turn-off sensitivity:</span>
+              <div class="input-group">
+              <input id="AhlSensitivityInput" type="text" class="form-control" placeholder="default"> </input><span class="input-group-addon">units</span>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="parameter-section">
+            <p class="section-collapse"></p>
+          </div>
+        </div>
+        
+        
+        
+        <!-- ******************* ROW 2 ******************* -->
+        
+        
+        
+        <div class="parameter-section-row" >
+          <button id="bttnRun" type="button" class="btn btn-primary">Run</button>
+        </div>
+      </div>
+      <li class='divider'></li>
+      <div class="dock">
+        <div class="graph-select">
+         <span class="graph-select-label">Gas Protein </span>
+         <div class="graph-group-dropdown-container">
+          <span class="graph-group-dropdown-label">group:</span>
+          <select id="gas-protein-group" class="graph-group-dropdown form-control" >
+            
+            <option selected="selected">1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+          </div>
+        </div>
+        <div class="graph-select">
+          <span class="graph-select-label"> Gas</span>
+          <div class="graph-group-dropdown-container">
+          <span class="graph-group-dropdown-label">group:</span>
+          <select id="gas-group" class="graph-group-dropdown form-control">
+            <option>1</option>
+            <option selected="selected">2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+          </div>
+        </div>
+        <div class="graph-select">
+          <span class="graph-select-label"> Gas Protein Repressor</span>
+          <div class="graph-group-dropdown-container">
+          <span class="graph-group-dropdown-label">group:</span>
+          <select id="repressor-group" class="graph-group-dropdown form-control" >
+            <option>1</option>
+            <option>2</option>
+            <option selected="selected">3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+          </div>
+        </div>
+        <div class="graph-select">
+          <span class="graph-select-label">AHLR</span>
+          <div class="graph-group-dropdown-container">
+          <span class="graph-group-dropdown-label">group:</span>
+          <select id="ahlr-group" class="graph-group-dropdown form-control" >
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option selected="selected">4</option>
+            <option>5</option>
+          </select>
+          </div>
+        </div>
+        <div class="graph-select">
+          <span class="graph-select-label"> AHL Synthesis</span>
+          <div class="graph-group-dropdown-container">
+          <span class="graph-group-dropdown-label">group:</span>
+          <select id="ahl-group" class="form-control graph-group-dropdown" >
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option selected="selected">5</option>
+          </select>
+          </div>
+        </div>
+      </div>
+      <div class="graph-display">
+        <div class="graph-label section-collapse"> - Graph group 1</div>
+        <div id="graph-group1" class="graph"></div>
+        <div class="graph-label section-collapse"> - Graph group 2</div>
+        <div id="graph-group2" class="graph"></div>
+        <div class="graph-label section-collapse"> - Graph group 3</div>
+        <div id="graph-group3" class="graph"></div>
+        <div class="graph-label section-collapse"> - Graph group 4</div>
+        <div id="graph-group4" class="graph"></div>
+        <div class="graph-label section-collapse"> - Graph group 5</div>
+        <div id="graph-group5" class="graph"></div>
+        
+      </div>
+      <li class='divider'></li>
+    </div>
+		
+	
+		<div class="description">
+      <h2>Governing equations</h2>
+      <h3>Gas production/dissipation</h3>
+      <p>
+				The rate of production of gas is proportional to the amount of gas protein in the system, and some gas 
+        dissipates at a constant rate. Thus,        
+        $$ {dQ_{gas} \over dt}  = P_{gas} \cdot Q_{gp} - D_{gas}  $$
+			</p><br>
+      <h3>Gas Protein Production/Decay</h3>
+			<p>
+        The production of the gas protein is affected negatively by its size, 
+        and positively by the promoter strength. <br><br>
+        Given enough repressor, the production of the protein drops exponentially to zero.<br>
+        Furthermore, it degrades with a given half-life. <br>
+        Thus,
+        $$
+        {dQ_{gp}\over dt} = \left\{ 
+        \begin{array}{l l}
+          -{Q_{gp} \cdot ln(1/2) \over \tau_{\text{gp-halflife}} } + P_{prom\_str} \cdot P_{size\_fact} \cdot e ^ { {- ( Q_{rep} - P_{thresh} ) / P_{thresh\_sensitivity} }} & \quad \text{if $Q_{rep} >= P_{thresh}$ }\\
+          -{Q_{gp} \cdot ln(1/2) \over \tau_{\text{gp-halflife}} } + P_{prom\_str} \cdot P_{size\_fact}  & \quad \text{o.w. }
+        \end{array} \right.
+        $$
+        Alright. The first half of this stuff is the half-life. Tau itself is the half-life.<br>
+        For this reason, the half-life is present regardless of the amount of repressor.<br>
+        The second part is the production. <br><br>
+        On the second equation, if the repressor is at small quantities, then the production is uninhibited. <br>
+        On the first equation, if there is enough repressor, the production quickly drops to zero, at an exponential rate.
+        How sensitive, or quick this "switch-off" occurs is controlled by the threshold sensitivity.<br>
+        The larger this factor, the slower the switch-off/switch-on.
+			</p><br>
+      <h3>Repressor Production/Decay</h3>
+			<p>
+				The repressor is promoted by the presence of gas. It will not be produced, if there is no gas.<br>
+        There has to be enough gas for the repressor to be generated. This is the repressor's threshold.<br>
+        The repressor itself has a half-life.<br>
+        Thus,
+        $$
+        {dQ_{rep}\over dt} = \left\{ 
+        \begin{array}{l l}
+          -{Q_{rep} \cdot ln(1/2) \over \tau_{\text{rep-halflife}} } + R_{prom\_str} \cdot R_{size\_fact} - R_{prom\_str} \cdot R_{size\_fact} \cdot e ^ { {- ( Q_{gas} - R_{thresh} ) / R_{thresh\_sensitivity} }} & \quad \text{if $Q_{gas} >= R_{thresh}$ }\\
+          -{Q_{rep} \cdot ln(1/2) \over \tau_{\text{rep-halflife}} }   & \quad \text{o.w. }
+        \end{array} \right.
+        $$
+			</p>
+      <br><br>
+      <p>
+        &copy; COMPUT-E.COLI, Gabriel Belmonte<br/>
+        Powered by:<br/>
+        &nbsp;&nbsp;<a href="https://developers.google.com/chart/">Google Visualization</a> for graphing<br/>
+        &nbsp;&nbsp;<a href="http://getbootstrap.com/">Bootstrap</a> for css <br/>
+        &nbsp;&nbsp;<a href="http://www.mathjax.org/">MathJax</a> for LaTeX math equation rendering.<br/>
+      </p>
+		</div>
+	</body>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+  <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      if (false)
+      {
+        google.setOnLoadCallback(drawChart);
+      }
+    </script>
+    <script src="js.js" type="text/javascript"></script>
+		<!--
+    <script src="background.js" type="text/javascript"></script>
+		-->
+    </html>

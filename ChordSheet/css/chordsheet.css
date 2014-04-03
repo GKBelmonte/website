@@ -1,0 +1,81 @@
+
+.head{
+border: 1px solid; 
+height: 98px; 
+width: 1092px; 
+margin: 45px 11% 12px; 
+text-align: center;
+font: 30px/45px Courier;
+border-radius: 5px 5px 5px 5px;
+}
+
+.example {
+    border: 1px solid #CCCCCC;
+    padding: 10px;
+}
+#drop_zone {
+    border: 2px dashed #BBBBBB;
+    border-radius: 5px 5px 5px 5px;
+    color: #BBBBBB;
+    margin-bottom: 11px;
+    margin-left: 20%;
+    padding: 25px;
+    text-align: center;
+    width: 60%;
+}
+
+#list {
+    left: 18%;
+    position: relative;
+}
+
+#list li strong{
+	cursor: pointer;
+}
+
+#changetone img{
+	cursor: pointer;
+}
+
+#changetone span {
+    font: 24px icon;
+    margin-left: 11%;
+}
+
+.sheet span{
+	color:blue;
+	position: relative;
+    top: 6px;
+	cursor:pointer;
+}
+
+.sheet .left{
+border: 1px solid;
+	height: auto; 
+	width: 45%; 
+	float: left; 
+	margin-right: 0px; 
+	margin-left: 4%; 
+	white-space: pre;
+    -moz-tab-size: 4;
+    font: 13px Courier New,Courier,monospace;
+	line-height:8px;
+	min-height:500px;
+	border-radius: 5px 5px 5px 5px;
+}
+
+.sheet .right{
+	border: 1px solid;
+	height: auto; 
+	width: 45%; 
+	float: right; 
+	margin-left: 0pt; 
+	margin-right: 4%;
+	white-space: pre;
+    -moz-tab-size: 4;
+    font: 13px Courier New,Courier,monospace;
+	line-height:8px;
+	min-height:500px;
+	border-radius: 5px 5px 5px 5px;
+}
+

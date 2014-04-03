@@ -1,0 +1,552 @@
+<!-- saved from url=(0014)about:internet -->
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"> 
+    <title>Evolve Material Values</title> 
+    <script type="text/javascript" src="../jquery.js"></script> 
+    <script type="text/javascript" src="../jquery-ui.js"></script> 
+    <script type="text/javascript" src="js/garbochess.js"></script>
+    <script type="text/javascript" src="js/boardui.js"></script>
+	<script type="text/javascript" src="js/Evaluator.js"></script>
+    <script type="text/javascript" src="js/GA.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/ga.css" />
+	<script type="text/javascript">
+	    $(document).ready(function () {
+	        g_timeout = 500;
+	        ResetGA();
+			$('.toggleHide').hide(1);
+			$('.history').hide(1);
+			$('.note-container').hide(1);
+	    });
+    </script> 
+      <style type="text/css">
+          #FenTextBox {
+              width: 400px;
+          }
+          #TimePerMove {
+              width: 50px;
+          }
+          .no-highlight {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+          }
+          .sprite-bishop_black{ background-position: 0 0; width: 45px; height: 45px; } 
+          .sprite-bishop_white{ background-position: 0 -95px; width: 45px; height: 45px; } 
+          .sprite-king_black{ background-position: 0 -190px; width: 45px; height: 45px; } 
+          .sprite-king_white{ background-position: 0 -285px; width: 45px; height: 45px; } 
+          .sprite-knight_black{ background-position: 0 -380px; width: 45px; height: 45px; } 
+          .sprite-knight_white{ background-position: 0 -475px; width: 45px; height: 45px; } 
+          .sprite-pawn_black{ background-position: 0 -570px; width: 45px; height: 45px; } 
+          .sprite-pawn_white{ background-position: 0 -665px; width: 45px; height: 45px; } 
+          .sprite-queen_black{ background-position: 0 -760px; width: 45px; height: 45px; } 
+          .sprite-queen_white{ background-position: 0 -855px; width: 45px; height: 45px; } 
+          .sprite-rook_black{ background-position: 0 -950px; width: 45px; height: 45px; } 
+          .sprite-rook_white{ background-position: 0 -1045px; width: 45px; height: 45px; }
+
+      </style>
+  </head> 
+  <body style="cursor: auto;" class="ui-droppable"> 
+
+    <div align="center" class="all-container">
+		
+		
+		<div class="head-container">
+			<div class="head"> A.G.E.S.: Evolve Chess Material Values Graphically </div>
+		</div>
+        
+		<div class="params">
+			<a href="javascript:showParams()" style="text-decoration: none;" class="plusMinus">&#43;</a> <!--&#45;/-->
+			<div class="toggleHide">
+				
+				Time per move: <input id="TimePerMove" value="500">ms <br>
+				Population size: <input id="in_popSize" value="12"><br>
+				Number of Generations: <input id="in_maxGen" value="12"><br>
+				Number of Max Moves: <input id="in_maxMoves" value="60"><br>
+				<button class= "button" onclick="ResetGA()" style="height:26px">Reset GA</button>
+				<button class= "button" onclick="UpdateParamsGA()" style="height:26px; width: 110px;">Update Params</button>
+				
+				<div style= "visibility: hidden;">
+					<a href="javascript:UINewGame()">New game</a>
+					<select onchange="javascript:UIChangeStartPlayer()">
+						<option selected="selected" value="white">White</option>
+						<option value="black">Black</option>
+					</select>
+					<a href="javascript:UIUndoMove()">Undo</a>
+				</div>
+			</div>
+		</div>
+		
+		<div class="full-container">
+
+			<table class="rounded-corner black-player">
+				<thead>
+					<tr>
+						<th class="top-left" scope="col">
+							Pawn
+						</th>
+						<th scope="col">
+							Knight
+						</th>
+						<th scope="col">
+							Bishop
+						</th>
+						<th scope="col">
+							Rook
+						</th>
+						<th class="top-right" scope="col">
+							Queen
+						</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td class="name" colspan="5">
+							<em>Igor</em>
+						</td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<tr>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div id="board">
+			<table class="no-highlight the-board" cellpadding="0px" cellspacing="0px">
+				<tbody>
+			<tr>
+				<span>0</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-rook_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-bishop_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-king_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-bishop_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-rook_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+			</tr>
+			<tr>
+				<span>1</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+			</tr>
+			<tr>
+				<span>2</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-knight_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_black">
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<span>3</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+			</tr>
+			<tr>
+				<span>4</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-queen_black">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+			</tr>
+			<tr>
+				<span>5</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-knight_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-knight_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+			</tr>
+			<tr>
+				<span>6</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-bishop_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-pawn_white">
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<span>7</span>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-rook_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-queen_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-rook_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(209, 137, 71);">
+					<div class="ui-draggable" style="position: relative;">
+						<div style="background-image: url(&quot;img/sprites.png&quot;);" class="sprite-king_white">
+						</div>
+					</div>
+				</td>
+				<td style="width: 45px; height: 45px; background-color: rgb(255, 206, 158);">
+				</td>
+			</tr>
+		</tbody>
+		</table>
+	</div> 
+			
+			<table class="rounded-corner white-player">
+				<thead>
+					<tr>
+						<th class="top-left" scope="col">
+							Pawn
+						</th>
+						<th scope="col">
+							Knight
+						</th>
+						<th scope="col">
+							Bishop
+						</th>
+						<th scope="col">
+							Rook
+						</th>
+						<th class="top-right" scope="col">
+							Queen
+						</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td class="name" colspan="5">
+							<em>DeepBlue</em>
+						</td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<tr>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+						<td>
+							0
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div style= "display: none;">
+				<span id="output">Ply:5 Score:1220 Nodes:68474 NPS:75913  a6 Bd3 Qg4 g3 Bd6</span>
+				<br> 
+				<textarea  cols="50" rows="6" id="PgnTextBox">1. d4 e6 2. e4 Qh4 3. Nf3 Qxe4+ 4. Be2 Nc6 5. c3 Nf6 6. Bg5 h6 7. Bxf6 gxf6 8. Na3 Rg8 9. O-O a6 </textarea><br>
+				<div>
+					<a id="AnalysisToggleLink" href="javascript:UIAnalyzeToggle()">Analysis: Off</a>
+				</div>
+				FEN: <input value="r1b1kbr1/pppp1p2/2n1pp1p/8/3Pq3/N1P2N2/PP2BPPP/R2Q1RK1 b q -" id="FenTextBox" onchange="javascript:UIChangeFEN()">
+			</div>
+		</div>
+        
+		<div class="controls">
+			<button class= "button" onclick="startGA()">Start</button>
+			<button class= "button" onclick="stopGame()">Pause</button>
+        </div>
+		
+		<div class="history-container">
+			<a href="javascript:showHistory()" style="text-decoration: none;" class="showHistory">Show History</a>
+			<div class="history">
+				<textarea  cols="50" rows="6" id="GenHistory">
+				</textarea>
+			</div>
+		</div>
+		
+		<div class="players-container">
+			<div class="players">
+		
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+				<div class="player-container"><table class="rounded-corner waiting-player"><thead><tr><th class="top-left" scope="col">Pawn</th><th scope="col">	Knight	</th><th scope="col">Bishop	</th><th scope="col">Rook</th><th class="top-right" scope="col">Queen</th>	</tr>	</thead>	<tfoot>	<tr><td class="name" colspan="5"><em>?</em>	</td></tr></tfoot><tbody><tr><td>0</td>	<td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+				</table></div>
+
+			</div>
+		</div>
+	
+		<br>
+		<div class="footer2">			
+			<h2 onclick="ToggleNotes()">&#43; Notes:</h2>
+			<div class="note-container">
+				<p>0. Parameters: the small plus sign before the table hides the parameters of the GA<br>
+					&emsp;&emsp;a. Time per move: Time the machine gets to think per move<br>
+					&emsp;&emsp;b. Population size: Size of the population of the GA<br>
+					&emsp;&emsp;c. Number of Generations: Number of generations before the GA auto-pauses<br>
+					&emsp;&emsp;d. Number of Max Moves: Maximum number of moves before the game auto-ends<br>
+				</p>
+				<p>1. At the end of a generation, individuals are highligther according to a simple scheme:<br>
+					&emsp;&emsp;a. Red: Individual dies and is replaced by a completely new individual<br>
+					&emsp;&emsp;b. Orange: Individual is replaced by a Mutant of the survivors, possibly himself.<br>
+					&emsp;&emsp;c. Yellow: Individual is replaced by a offspring of the survivors, possibly his offspring<br>
+					&emsp;&emsp;d. Green: Individual lives to the next generation<br>
+				</p>
+				<p>2. Background workers: This code requires the use of HTML 5 background workers that behave as a background thread. 
+				If your browser does not support it, then you must try a different browser (Firefox recommended).<br>
+				Furthermore, due to security reasons, Chrome does not allow the creationg of Workers in a local context.
+				If you are seeing this error in Chrome, try closing all chrome instances and runing Chrome like this:</p>
+				<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; width:88%;margin-left:11%;">
+					<span class="code sc2">cd</span><span class="code sc0"> "C:\Users\</span><span class="code sc6">%USERNAME%</span><span class="code sc0">\AppData\Local\Google\Chrome\Application"</span>
+					<span class="code sc5">chrome.exe</span><span class="code sc0"> --allow-file-access-from-files --disable-web-security</span>
+					<span class="code sc2">pause</span>
+					<span class="code sc0"> </span>
+				</div>
+				<p> or whatever path your Chorme might be on.</p>
+				<p>References:</p>
+				<p>
+					<a href="Paper.pdf">GA IEEE Paper and Annalysis</a> (may not properly display browser Adobe Reader)
+				</p>
+				<p>
+					<a href="LICENSE-Blaze.txt">Software license</a>
+				</p>
+				<p>
+					<a href="http://forwardcoding.com/projects/ajaxchess/chess.html">Original Chess AI</a>
+					N.B.: This will redirect you to an external webpage.
+				</p>
+				<p>
+					<a href="LICENSE-garbojs.txt">Original Chess AI License</a>
+				</p>
+			</div>
+		</div>
+	</div> 
+		
+   
+ 
+</body></html>

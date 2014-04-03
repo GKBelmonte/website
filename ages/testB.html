@@ -1,0 +1,80 @@
+<!-- saved from url=(0014)about:internet -->
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"> 
+    <title>GarboChess Javascript</title> 
+    <script type="text/javascript" src="js/jquery-1.js"></script> 
+
+    <script type="text/javascript" src="js/testB.js"></script>
+	<script type="text/javascript">
+	var x = null;
+	var y = null;
+	    $(document).ready(function () 
+		{
+	         x = new Worker("js/testB.js");
+			 y = new Worker("js/testB.js");
+			 var k1 = {"command" : "set" , "val" : 2 };
+			 var k2 = {"command" : "set" , "val" : 5 };
+			 x.postMessage(JSON.stringify(k1));
+			 y.postMessage(JSON.stringify(k2));
+			 
+			 x.onmessage = function (e)
+			 {
+				console.log("x");
+				console.log("\t" + e.data);
+			 }
+			 
+			  y.onmessage = function (e)
+			 {
+				console.log("y");
+				console.log("\t" + e.data);
+			 }
+			 
+			 console.log(FacePalm());
+	    });
+    </script> 
+      <style type="text/css">
+          #FenTextBox {
+              width: 400px;
+          }
+          #TimePerMove {
+              width: 50px;
+          }
+          .no-highlight {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+          }
+          .sprite-bishop_black{ background-position: 0 0; width: 45px; height: 45px; } 
+          .sprite-bishop_white{ background-position: 0 -95px; width: 45px; height: 45px; } 
+          .sprite-king_black{ background-position: 0 -190px; width: 45px; height: 45px; } 
+          .sprite-king_white{ background-position: 0 -285px; width: 45px; height: 45px; } 
+          .sprite-knight_black{ background-position: 0 -380px; width: 45px; height: 45px; } 
+          .sprite-knight_white{ background-position: 0 -475px; width: 45px; height: 45px; } 
+          .sprite-pawn_black{ background-position: 0 -570px; width: 45px; height: 45px; } 
+          .sprite-pawn_white{ background-position: 0 -665px; width: 45px; height: 45px; } 
+          .sprite-queen_black{ background-position: 0 -760px; width: 45px; height: 45px; } 
+          .sprite-queen_white{ background-position: 0 -855px; width: 45px; height: 45px; } 
+          .sprite-rook_black{ background-position: 0 -950px; width: 45px; height: 45px; } 
+          .sprite-rook_white{ background-position: 0 -1045px; width: 45px; height: 45px; }
+          
+          
+        #marksL {
+            left: 32%;
+            position: absolute;
+            top: 34px;
+        }
+          
+          #marksL p
+          {
+              margin-bottom: 24px;
+          }
+          
+        #marksB span {
+            left: -16px;
+            margin-left: 33px;
+            position: relative;
+        }
+      </style>
+  </head> 
+	<body style="cursor: auto;" class="ui-droppable"> 
+	</body>
+
+</html>

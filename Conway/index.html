@@ -1,0 +1,258 @@
+<html><head>
+		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+		<title>One Dimensional Game Of Life</title> 
+                <script src="../jquery.js"></script>
+		
+		<style type="text/css">
+          .allContainer{
+			margin-left: 12%;
+			width: 15%;
+			float:left;
+		  }
+                  #text-in {
+                      width: 45%;
+                  }
+           #text-out {width: 50%;}
+           #Execute {width : 100px;
+           border: 2px solid rgba(0, 0, 0, 0);
+           font-weight: bold;}
+
+.cell {
+    border-style: solid;
+    border-width: 1px;
+    float: left;
+    height: 13px;
+    width: 13px;
+    border-radius: 9px;
+    border-color: #2550FA;
+    box-shadow: 0 0 13px #9ecaed;
+}
+
+.state {
+    height: 290px;
+    
+
+}
+.state-label {
+    height: 20px;
+    width: 540px;
+        color: #4526CF;
+        
+}
+
+.state-label h2
+{
+  font:20px 'Times New Roman',sans-serif;
+  color:#2550FA;
+
+}
+.truth-tables
+{
+	margin-left: 76px;
+	width: 200px;
+	float:left;
+  margin-top:35px;
+}
+.truth-table {
+    height: 280px;
+    width: 100px;
+	padding-top:20px;
+	padding-right:20px;
+}
+
+.truth-table-mob {
+    background: none repeat scroll 0 0 white;
+    border-style: solid;
+    border-width: 1px;
+    height: 238px;
+    left: 205px;
+    padding-left: 10px;
+    padding-right: 0;
+    padding-top: 10px;
+    position: absolute;
+    top: 20px;
+    width: 92px;
+	
+}
+.truth-table-row {
+    height: 25px;
+    width: 60px;;
+	float:left;
+}
+.truth-table-head {
+    height: 30px;
+    width: 80px;;
+	float:left;
+}
+/*truth table row cell*/
+.ttrc
+{
+    height: 15px;
+    width: 20px;
+	float: left;
+}
+/*truth table row value*/
+.ttrv
+{
+    height: 15px;
+    width: 15px;
+	float: left;
+}
+/*truth table row input*/
+.ttri
+{
+	height: 24px;
+    width: 40px;
+	float: left;
+}
+/*truth table row input text*/
+.ttrit
+{
+	height: 21px;
+    width: 38px;
+	float: left;
+}
+.load-range-tb
+{
+	height: 21px;
+    width: 38px;
+}
+
+.description
+{
+	margin-top: 30px;
+	margin-left: 8%;
+	width: 45%;
+	float: left;
+}
+.btn-success {
+    background-color: #2550FA;
+    border-color: #4CAE4C;
+    color: #FFFFFF;
+}
+.btn-default {
+    background-color: #FFFFFF;
+    border-color: #CCCCCC !important;
+    color: #333333;
+    padding-bottom:2px;
+}
+.btn {
+    -moz-user-select: none;
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 4px 4px 4px 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857;
+   
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+      </style>
+	</head> 
+	<body class="ui-droppable" style="cursor: auto;"> 
+		<div class="allContainer">      
+      <div class="state-label"><h2>Circular one-dimensional Cellular Automata</h2></div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				
+        <div class="cell"></div>
+				<div class="cell"></div>
+			</div>
+			<button class='btn btn-success' id="Execute" onclick="javascript:Execute()">Execute</button>
+		</div>
+		
+		<div class="truth-tables">
+			<div class="truth-table" index="x">
+				<div class="truth-table-head">Truth table</div>
+        <div class="truth-table-row"><div class="ttrc">Q<sub>l</sub></div><div class="ttrc">Q<sub>c</sub></div><div class="ttrc">Q<sub>r</sub></div></div><div class="ttri">Q<sub>c+1</sub></div>
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttri"><input class="ttrit" placeholder='0' value='0'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttri"><input class="ttrit" placeholder='0' value='0'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttri"><input class="ttrit" placeholder='0' value='0'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttri"><input class="ttrit" placeholder='1' value='1'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttri"><input class="ttrit" placeholder='1' value='1'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttri"><input class="ttrit" placeholder='1' value='1'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttri"><input class="ttrit" placeholder='1' value='1'></input></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttri"><input class="ttrit" placeholder='0' value='0'></input></div>
+				<div class="ttlbc" ><button class="btn btn-default ttlb" onclick="LoadTX()" >Load</button></div>
+			</div>
+			<div class="truth-table-mob">
+				<div class="truth-table-head">Truth table x</div>
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+			</div>
+		</div>
+	
+		
+	</body>
+	<script src="js.js" type="text/javascript"></script>
+		</html>

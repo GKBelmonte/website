@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+		<title>Gabriel Belmonte's  Site</title> 
+    <script src="jquery.js"></script>
+    <script src="utils.js"></script>
+    <!--<script type="text/javascript"  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    -->
+    <link rel='stylesheet' href='bootstrap/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='css.css' />
+		<style type="text/css">    </style>
+	</head> 
+  
+  
+	<body style="cursor: auto;"> 
+
+    <div class="allContainer">
+      <div class="title">
+        <img src="img/phoenix.png" alt="logo"/>
+        <h1 class='text-right'>Gabriel Belmonte</h1>
+      </div>
+      <h3 class="parameters-label section-expand" speed='400' >+ About me</h3 >
+      <div class="all-parameters" style='display:none;'>
+        
+        
+        <!-- ******************* ROW 0 ******************* -->
+       
+        
+        <div class="parameter-section-row">
+
+          <p>Hi there! My name is Gabriel Belmonte. I am a fourth (final) year Computer Engineering
+          at Concordia University. This is where I will create my website when school,
+          and side projects give me the change to execute this awesome task :) </p>
+          <p></p>
+
+        </div>
+         
+      </div>
+      <div class='divider-container'>
+      <li class='divider'></li>
+      </div>
+      <h3 class="project-label" >Projects</h3 >
+      <div class="dock">
+        <div class="select">
+         <span class="select-label" id='ages'>Genetic algorithms and chess</span>
+        </div>
+        <div class="select">
+          <span class="select-label" id='conway'>1-D Conway's game of life </span>
+        </div>
+        <div class="select">
+         <span class="select-label" id='igem'>iGEM Protein Synthesis Decay </span>
+        </div>
+        <div class="select">
+         <span class="select-label" id='chordsheet'>Chordsheet </span>
+        </div>
+        <div class="select">
+         <span class="select-label" id='ht'>In Progress: Hammerhead Design </span>
+        </div>
+      </div>
+      <div class="display">
+        <div id='DescriptionDefault'>
+          <p > Click on a project on the left to see more about it </p>
+        </div>
+        <div id='igem-description' style='display:none;'>
+          <p  > iGEM Protein synthesis/decay <a href='ProteinSynthesis/index.html'>project</a> for 
+          <a href='http://2013.igem.org/Main_Page'>iGEM competition 2013</a> 
+          </p>
+        </div>
+        <div id='conway-description' style='display:none;'>
+          <h4> Conway's <a href='Conway/index.html'>Game of Life</a>! </h4>
+          <p>The simple code in the page allows you to try out
+          what a one-dimensional version of Conway's Game of Life would be like.
+          Except you pick your own rules.
+          Each cell is either alive or dead (on/off, 1/0, High/low), and
+          its transition will depend on whether its neighbours are alive/dead.
+          <br>
+          <br>
+          At every period, all cells will move to their next state, producing
+          interesting patterns.
+          </p>
+          <p>
+            Play with it and see what you can make :)
+          </p>
+          
+          <p>(also see <a href='Conway/explore/index.html'>this one</a> for an explorative version)</p>
+          <h5>About the Game of Life</h5>
+          <p>The <a href='http://www.math.com/students/wonders/life/life.html'>Game of Life</a> is particularly well known among geeks. It's a zero-player game,
+          where once the initial conditions are set, the destiny of all things will naturally unfold. 
+          <br>And the player does nothing about it... well, except set the initial conditions.</p>
+          <p>This seemingly trivial concept was invented by no other than <a href='http://en.wikipedia.org/wiki/John_von_Neumann'>John von Neunmann</a>
+           who was thinking about self-replicating robots. These would have to go through 26 states of construction before finishing their replication.
+           <br>
+           When he realized the complexity of the task, he sort-of gave up.
+           <br>
+           Instead, he took up the work of one of his colleges in crystal growth, as crystals grow outwards in a
+           periodic pattern, they were far-simplified analogues of replicating robots (also in some repeating pattern).
+           <br>The different possible molecules mapped to the different possible states.<br>
+           The final result of their work was <a href='http://en.wikipedia.org/wiki/Cellular_automata'>Cellular Automata</a>,
+           the idea that individual "cells" would be affected by their immediate neighbours to change state.           
+          </p>
+          <p>
+            Then Conway came along and popularized the concept with <a href='http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'>The Game Of Life</a>.
+            <br>A simple set of rules resulting in dynamic and complex behaviours.
+          </p>
+          <p>
+            The last brilliant player in the conception of this construct was <a href='http://en.wikipedia.org/wiki/Stephen_Wolfram'>Stephen Wolfram</a>.
+            <br>
+            He proved that the simples for of this construct, a one-dimensional line
+            of 'cells' were capable of being programmed...<br>
+            To do anything. <a href='http://www.cs.may.ie/~tnaughton/abc/download/dw15.pdf'>Anything at all</a>.
+            <br>
+            This property known as <a href='http://en.wikipedia.org/wiki/Turing_completeness'>Turing Completeness</a> 
+            makes for a very mind-blowing concept. 
+            <br>8 simple rules are enough to construct a Turing complete machine...
+            (with a little exponential overhead, of course)
+          </p>
+        </div>
+        
+        <div id='ht-description'   style='display:none;'>
+          <p> Hammerhead's hitting hard <a href='http://www.drkharma.com/ribosoft/'>((lots of )Work in progress)</a>
+          </p>
+        </div>
+        <div id='chordsheet-description' style='display:none;'>
+          <p > 
+          A simple guitar <a href='ChordSheet/index.html'>Chordsheet</a>
+          </p>
+        </div>
+        <div id='ages-description' style='display:none;'>
+          <h4>Using Genetic Algorithms to <a href='ages/index.html'>evolve chess playing</a> algorithms</h4>
+          <p > 
+            You can find the details in the project, including my <a href='ages/Paper.pdf'>report</a> on the matter.
+          </p>
+          <p>Let's talk about motivation instead:</p>
+          <p>
+            In Uni, I walk into many semesters scared sh*tless. <br>
+            The names are daunting:<br>
+            &nbsp;&nbsp;&nbsp;Digital-system design<br>
+            &nbsp;&nbsp;&nbsp;Signal and System Analysis<br>
+            &nbsp;&nbsp;&nbsp;Applied Semi-conductor Theory<br>
+            &nbsp;&nbsp;&nbsp;Real-time systems<br>
+            &nbsp;&nbsp;&nbsp;Applied Genetic Evolutionary Systems (AGES)<br>
+            <br>
+            I walk into class wandering what it will be like. The name sounding like something far too
+            complex for me to grasp in the mere space of 4 months. In which my attention will be divided across
+            3 other classes, extra-curriculars, part-time work, etc...<br>
+            But as the class progresses, the mystique and profound sounding names lose their strange mists and 
+            emerge as simple, clever concepts designed on the shoulder of giants. <br>
+            <br>This was AGES. <br>
+            <br>
+            The name is simply a nice acronym for Genetic Algorithms, that makes it sound even more fancy, <br>
+            much more that it actually is.<br>
+            Or maybe because it literally takes AGES to get a result.<br>
+          </p>
+          <p>
+            Either way, it does not matter.<br>
+            <br>
+            We take a problem and find a novel approach of tackling it. This is the essence of engineering.
+          </p>
+        </div>
+      </div>
+      
+
+    </div>
+
+  </body>
+  <script src="js.js" type="text/javascript"></script>
+
+</html>

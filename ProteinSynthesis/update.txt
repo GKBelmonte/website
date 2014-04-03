@@ -1,0 +1,16 @@
+
+Website deployed here: http://www.drkharma.com/gas-clock-simulation/src/protein-gen-decay-sim.html
+
+To update the site, use the following steps:
+1- Login into Kharma's server, using putty, with the following info:
+
+Host name: 173.246.102.200
+Username: ***
+Password: ***
+
+2- Go to the repo's folder, using the command: 'cd /var/www/KharmaSite/gas-clock-simulation'
+3- Run the script `updateSite`, using the command: './updateSite'
+
+You will be asked for the sudo password (the one from above), and your bitbucket credentials.
+
+Let me know if you need anything else

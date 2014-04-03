@@ -1,0 +1,655 @@
+<html><head>
+		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+		<title>Test</title> 
+                <script src="../../jquery.js"></script>
+		
+		<style type="text/css">
+          .allContainer{
+			margin-left: 8%;
+			width: 45%;
+			float:left;
+		  }
+                  #text-in {
+                      width: 45%;
+                  }
+           #text-out {width: 50%;}
+           #Execute {width : 100px}
+
+.cell {
+    border-style: solid;
+    border-width: 1px;
+    float: left;
+    height: 10px;
+    width: 10px;
+}
+
+.state {
+    height: 20px;
+
+}
+.state-label {
+    height: 20px;
+    width: 540px;
+}
+.truth-tables
+{
+	margin-left: 8%;
+	width: 20%;
+	float:left;
+}
+.truth-table {
+    height: 280px;
+    width: 100px;
+	padding-top:20px;
+	padding-right:20px;
+}
+
+.truth-table-mob {
+    background: none repeat scroll 0 0 white;
+    border-style: solid;
+    border-width: 1px;
+    height: 238px;
+    left: 205px;
+    padding-left: 10px;
+    padding-right: 0;
+    padding-top: 10px;
+    position: absolute;
+    top: 20px;
+    width: 92px;
+	
+}
+.truth-table-row {
+    height: 25px;
+    width: 60px;;
+	float:left;
+}
+.truth-table-head {
+    height: 30px;
+    width: 80px;;
+	float:left;
+}
+/*truth table row cell*/
+.ttrc
+{
+    height: 15px;
+    width: 15px;
+	float: left;
+}
+/*truth table row value*/
+.ttrv
+{
+    height: 15px;
+    width: 15px;
+	float: left;
+}
+/*truth table row input*/
+.ttri
+{
+	height: 24px;
+    width: 40px;
+	float: left;
+}
+/*truth table row input text*/
+.ttrit
+{
+	height: 21px;
+    width: 38px;
+	float: left;
+}
+.load-range-tb
+{
+	height: 21px;
+    width: 38px;
+}
+
+.description
+{
+	margin-top: 30px;
+	margin-left: 8%;
+	width: 45%;
+	float: left;
+}
+      </style>
+	</head> 
+	<body class="ui-droppable" style="cursor: auto;"> 
+		<div class="allContainer">
+			<div class="state-label">truth table id=0</div>		
+			<div class="state" >
+				<div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div> <div class="state-label">truth table id=1</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=2</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=3</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=4</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=5</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=6</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=7</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=8</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=9</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div><div class="state-label">truth table id=x</div>
+			<div class="state" >
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+				<div class="cell"></div>
+			</div>
+			<button id="Execute" onclick="javascript:Execute()">Execute</button> &nbsp;&nbsp;&nbsp;&nbsp; Load range from  <textarea class="load-range-tb">0</textarea> <button id="Load" onclick="javascript:LoadRange()">Load</button>
+		</div>
+		
+		<div class="truth-tables">
+			<div class="truth-table" index="x">
+				<div class="truth-table-head">Truth table x</div>
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttri"><textarea class="ttrit">0</textarea></div>
+				<div class="ttlbc" ><button class="ttlb" onclick="LoadTX()" >Load</button></div>
+			</div>
+			<div class="truth-table-mob">
+				<div class="truth-table-head">Truth table x</div>
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">0</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">0</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">0</div></div><div class="ttrv">x</div>
+
+				<div class="truth-table-row"><div class="ttrc">1</div><div class="ttrc">1</div><div class="ttrc">1</div></div><div class="ttrv">x</div>
+
+			</div>
+		</div>
+	
+		<div class="description">
+			<p>
+				The first 10 tables are auto-generated on possible rules. Theres 256 of them (2^8) (since each of the 8 rules can be either 0 or 1)
+				Due to the beauty of simmetry, 128 of them will be exactly the opposite of the other ones, thus are probably not that intersting.
+			</p>
+			<p>
+				The load button for the truth table loads the specified set of rules to the last row, table x. 
+				The other load button with a number loads rules n through n + 9
+			</p>
+			<p>
+				The state can be changed by clicking on a cell turning on and off.
+			</p>
+		</div>
+	</body>
+	<script src="js.js" type="text/javascript"></script>
+		</html>

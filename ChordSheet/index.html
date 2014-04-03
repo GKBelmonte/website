@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>ChordSheet</title>
+	<!--script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.min.js">Old JS which Chris does not like</script!-->
+	<script type="text/javascript" src="../jquery.js"></script>
+		
+	<!--The CSS -->
+	<link rel="stylesheet" type="text/css" href="css/chordsheet.css" />
+	
+</head>
+
+<body>
+	<div class="head">Song Title</div>
+	<div id="drop_zone">Drop chord sheet to load here</div>
+	<output id="list"></output>
+	
+	<div id='changetone'>
+	<span> Change tone: </span>
+	<img src="img/minus.png"  width="15" height="15" id='imgminustone' />
+	<img src="img/plus.png" width="15" height="15" id='imgplustone'/>
+	<span> Line height: </span>
+	<img src="img/minus.png"  width="15" height="15" id='imgminuslineh' />
+	<img src="img/plus.png" width="15" height="15" id='imgpluslineh'/>
+		<span> Top: </span>
+	<img src="img/minus.png"  width="15" height="15" id='imgminustop' />
+	<img src="img/plus.png" width="15" height="15" id='imgplustop'/>
+	</div>
+	<div class="sheet">
+		<div class="left">
+		</div>
+		<div class="right">
+		</div>
+	</div>
+</body>
+	<script type="text/javascript" src="js/ChordSheet.js"></script>
+</html>
