@@ -191,29 +191,34 @@ function ParetoFrontRank(array, propertyArray, maxMinArray, rank)
     var queueArray = array.slice();
     do {
         var frontIndexes = new Array();
-        for (var ii = 0; ii < queueArray.length ; ++ii) {
+        for (var ii = 0; ii < queueArray.length ; ++ii)
+        {
             var testElement = queueArray[ii];
             var testElementDominated = false;
-            for (var jj = 0; jj < queueArray.length; ++jj) {
-                if (ii == jj) {
+            //console.log("Is " + testElement.cutSiteID + ":" + testElement.ID + " dominateed?  " );
+            for (var jj = 0; jj < queueArray.length; ++jj)
+            {
+                if (ii == jj) 
                     continue;//do not test an element against itself
-                }
-                else {
-                    //an element is rank 0 if no one dominates him. Check if any element dominates him
-                    var dominated = _paretoGreaterThan(queueArray[jj], testElement, propertyArray, maxMinArray);
-                    if (dominated) {
-                        var equal = _paretoEqual(queueArray[jj], testElement, propertyArray, 0.01);
-                        //an object dominates itself since it is no better at anything than itself. Identical objects must be caught
-                        if (!equal) {
-                            testElementDominated = true;
-                            break;
-                        }
+
+                //an element is rank 0 if no one dominates him. Check if any element dominates him
+                var dominated = _paretoGreaterThan(queueArray[jj], testElement, propertyArray, maxMinArray);
+                    
+                if (dominated) {
+                    var equal = _paretoEqual(queueArray[jj], testElement, propertyArray, 0.01);
+                    //an object dominates itself since it is no better at anything than itself. Identical objects must be caught
+                    if (!equal) {
+                        //console.log("\tYes by:"  + queueArray[jj].cutSiteID + ":" + queueArray[jj].ID );
+                        testElementDominated = true;
+                        break; ///BREAK GOES TO (1)
                     }
                 }
-            }
+                
+            }// THIS IS (1)
 
             //Not dominated, so it belongs to pareto front
             if (!testElementDominated) {
+                //console.log("Element " + testElement.cutSiteID + ":" + testElement.ID + " gets rank " +rank);
                 testElement.rank = rank;
                 frontIndexes.push(ii);
             }
@@ -305,6 +310,31 @@ String.prototype.indexOfMultiple=function(Arr)
 	return min;
 }
 
+function RegisterKonamiCode( foo )
+{
+    if ( window.addEventListener ) 
+		{
+			var InsertedKeys = [];
+			var konami = "38,38,40,40,37,39,37,39,66,65";
+			window.addEventListener("keydown", 
+        function(e)
+        {
+          if(InsertedKeys.length > 10)
+            InsertedKeys.splice(0,1);
+          InsertedKeys.push( e.keyCode );
+          if ( InsertedKeys.toString().indexOf( konami ) >= 0 )
+          {	
+            foo();
+          }
+          console.log(e.keyCode);
+        }, 
+			true);
+        return true;
+        
+		}
+      return false;
+}
+
 String.prototype.replaceAt=function(index,string, len) 
 {
   if(len == undefined)
@@ -388,35 +418,14 @@ function CreateBackgroundEngine(filepath, customOnMessage, overrideWrapper) {
     return engine;
 }
 
-function CreateProperMessage ( command , value )
-{
-    var stringed = JSON.stringify(value);
-    var obs = { "command" : command, "vals" : stringed };
-    var total = JSON.stringify(obs);
-    return total;
-}
 
-function ReadProperMessage(message)
-{
-    var obj = null;
-    try{ obj = JSON.parse(message);}
-    catch (ex) { obj = null/*postMessage("Unrecognized command") ;*/ }
-    
-    if(obj != null )
-    {
-        var v = JSON.parse(obj.vals);
-        var c =  obj.command;
-        obj = { "command" : c, "vals" : v };
-    }
-    return obj;
-}
 
 /**
 Shove something similar in the background process
 */
 self.onmessage = function (e) {
    
-    var obj = ReadProperMessage(e.data);
+    var obj = e.data;//ReadProperMessage(e.data);
     
     if(obj != null )
     {
