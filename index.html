@@ -30,7 +30,7 @@
         
         <div class="parameter-section-row">
 
-          <p>Hi there! My name is Gabriel Belmonte. I am a fourth (final) year Computer Engineering
+          <p>Hi there! My name is Gabriel Belmonte. I am recent Computer Engineering
           at Concordia University. This is where I will create my website when school,
           and side projects give me the chance to execute this awesome task :) </p>
           <p></p>
@@ -62,18 +62,25 @@
         <div class="select">
          <span class="select-label" id='yhack'>YHack: Music reverse engineering </span>
         </div>
+        
+        <div class="select">
+         <span class="select-label" id='gotcha' style='display:none;'> Beat my AI! </span>
+        </div>
       </div>
+      
+      
+      
       <div class="display">
         <div id='dock-description'>
           <p > Lorem Ipsum si tollit pollit.</p>
         </div>
         <div id='DescriptionDefault'  style='display:none;'>
         
-         <p > Click on a project on the left to see more about it</p>
+         <p > Click on a project on the left to see more about it.  </p>
         </div>
         <div id='igem-description' style='display:none;'>
           <p  > iGEM Protein synthesis/decay <a href='ProteinSynthesis/index.html'>project</a> for 
-          <a href='http://2013.igem.org/Main_Page'>iGEM competition 2013</a> 
+          <a href='http://2013.igem.org/Main_Page'>iGEM competition 2013</a> .
           </p>
         </div>
         <div id='conway-description' style='display:none;'>
@@ -103,26 +110,28 @@
            When he realized the complexity of the task, he sort-of gave up.
            <br>
            Instead, he took up the work of one of his colleges in crystal growth, as crystals grow outwards in a
-           periodic pattern, they were far-simplified analogues of replicating robots (also in some repeating pattern).
+           periodic pattern, they were far-simplified analogues of replicating robots (as it is also a self-replicating pattern).
            <br>The different possible molecules mapped to the different possible states.<br>
            The final result of their work was <a href='http://en.wikipedia.org/wiki/Cellular_automata'>Cellular Automata</a>,
-           the idea that individual "cells" would be affected by their immediate neighbours to change state.           
+           the idea that individual "cells" would be affected by their immediate neighbours to change state, and it
+           ended up being a very interesting computational mode.
           </p>
           <p>
             Then Conway came along and popularized the concept with <a href='http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'>The Game Of Life</a>.
-            <br>A simple set of rules resulting in dynamic and complex behaviours.
+            <br>A simple set of rules on how to treat cells of a matrix could result in dynamic and complex behaviours.
           </p>
           <p>
-            The last brilliant player in the discovery of this construct was <a href='http://en.wikipedia.org/wiki/Stephen_Wolfram'>Stephen Wolfram</a>.
+            The last brilliant player in the understanding of this construct was <a href='http://en.wikipedia.org/wiki/Stephen_Wolfram'>Stephen Wolfram</a>.
             <br>
-            He proved that the simples for of this construct, a one-dimensional line
+            He proved that the simplest for of this construct, a one-dimensional line
             of 'cells' were capable of being programmed...<br>
             To do anything. <a href='http://www.cs.may.ie/~tnaughton/abc/download/dw15.pdf'>Anything at all</a>.
             <br>
             This property known as <a href='http://en.wikipedia.org/wiki/Turing_completeness'>Turing Completeness</a> 
             makes for a very mind-blowing concept. 
             <br>8 simple rules are enough to construct a Turing complete machine...
-            (with a little exponential overhead, of course)
+            (with a little exponential overhead, of course).
+            <br>This is effectively a machine capable of solving any problem any computer has ever solved.
           </p>
         </div>
         
@@ -138,17 +147,25 @@
         </div>
         <div id='chordsheet-description' style='display:none;'>
           <p > 
-          A simple guitar <a href='ChordSheet/index.html'>Chordsheet</a>
+          A simple guitar <a href='ChordSheet/index.html'>Chordsheet</a>.
+          <br>
+            I use it as a rudimentary tool to read guitar chords and transpose them once I have figured out the chords. It is also
+            particularly useful since it uses two columns and you don't have to scroll as often.
           </p>
         </div>
         <div id='ages-description' style='display:none;'>
           <h4>Using Genetic Algorithms to <a href='ages/index.html'>evolve chess playing</a> algorithms</h4>
+          <p>
+            Every chess player knows a pawn is worth less than a bishop. They would gladly sacrifice a rook for queen too. But would they sacrifice two of them? Would they sacrifice all their pawns for a queen? Sure, it might be circumstantial, but how much are pieces worth
+            is a non-trivial matter when it comes to playing chess, and specially when making computers play chess since that is how they evaluate a good move. However, if experts can't agree on the worth of pieces, what worth should a computer program use?
+            <br>Well, it can figure that out on its own using a genetic algorithm.
+          </p>
           <p > 
             You can find the details in the project linked above, including my <a href='ages/Paper.pdf'>report</a> on the matter.
           </p>
-          <p>Let's talk about motivation instead:</p>
+          <p>Let's talk about motivation:</p>
           <p>
-            In Uni, I walk into many semesters scared to see my schedule. <br>
+            In Uni, I start many semesters scared to see my scheduled classes. <br>
             The names are daunting:<br>
             &nbsp;&nbsp;&nbsp;Digital-system design<br>
             &nbsp;&nbsp;&nbsp;Signal and System Analysis<br>
@@ -156,7 +173,7 @@
             &nbsp;&nbsp;&nbsp;Real-time systems<br>
             &nbsp;&nbsp;&nbsp;Applied Genetic Evolutionary Systems (AGES)<br>
             <br>
-            I walk into class wandering what it will be like. The name sounding like something far too
+            I walk into class wondering what it will be like. The name sounding like something far too
             complex for me to grasp in the mere space of 4 months. In which my attention will be divided across
             3 other classes, extra-curriculars, part-time work, etc...<br>
             But as the class progresses, the mystique and profound names lose their strange mists and 
@@ -177,14 +194,14 @@
         <div id='yhack-description' style='display:none;'>
           <h4>Using <a href='http://en.wikipedia.org/wiki/Fast_Fourier_transform'>DFFT</a> to reverse engineer a musical piece</h4>
           <p > 
-            Fancy acronyms and stuff... Really, all I was doing was reading some music file using some <a href='http://reference.wolfram.com/mathematica/tutorial/FourierTransforms.html'>powerful framework</a> to attempt
+            Fancy acronyms and stuff... Really, all I was doing was writing a program that read some music file using a <a href='http://reference.wolfram.com/mathematica/tutorial/FourierTransforms.html'>powerful framework</a> to attempt
             to create the corresponding musical sheet.
           </p>
           <p>I guess I am jumping the gun. Context first: <a href='http://www.y-hack.com/'>YHack </a></p>
           <p>
             Y not? <br/>
-            I cannot conceive why any sane programmer would not like to go to one of these neat competitions to meet like-minded people,
-            sleep close to nothing, write the hackiest code they can come up to, get awesome swag, curse at infinite loops at 4 A.M., eat junk food and <a href='http://blisshabits.com/2012/05/what-sleep-deprivation-taught-me-about-joy/'>laugh maniacally</a> due to <a href='http://abcnews.go.com/Technology/sleep-leave-laughing/story?id=13250606'>sleep deprivation</a>. 
+            I cannot conceive why any sane programmer would not like to go to one of these neat competitions, to meet like-minded people,
+            sleep close to nothing, write the hackiest code they can come up with, get awesome swag, curse at infinite loops at 4 A.M., eat junk food and <a href='http://blisshabits.com/2012/05/what-sleep-deprivation-taught-me-about-joy/'>laugh maniacally</a> due to <a href='http://abcnews.go.com/Technology/sleep-leave-laughing/story?id=13250606'>sleep deprivation</a>. 
           </p>
           <p>OK, there might be reasons why not to embark in such an exhausting, yet entertaining idea, but the tight delivery of a product within a strict
           deadline and the necessity evaluate risks and trade-offs on a (very) short notice is an experience every developer ought to try.
@@ -203,17 +220,61 @@
           in short, it could handle a single "entity" playing more than one note at a time.
           <br/> The use of the word "entity" is due to the fact that a violin section would probably be interpreted well, but it is technically more than one instrument.</p>
           
-          <p>The result was reasonable, as my teammate <a>Josh</a> got this neat <a href=''>music sheet API </a> working I got Mathematica operating with C# (disappointed at the lack of code doc) and the other two players had fun making a cube turning around in HTML5.
+          <p>The result was reasonable, as my teammate <a href='http://www.linkedin.com/in/jjwhatley'>Josh</a> got this neat <a href='http://www.musicxml-viewer.com/features/basic-usage/basic-usage.html'>music sheet API </a> working I got Mathematica operating with C# (though disappointed at the lack of code doc) and the other two players had fun making a cube turning around in HTML5.
           </p> 
           <p>However, we were attempting to turning this into a web service and due to 
           technical difficulties with providers and etc. we ended having a nice front-end and a nice back-end that just did not communicate...
           </p>
           <p>In retrospect, we should have showed the judges just the back end, but then again,
-          hindsight is 20/20.</p>
+          that is why it is said that hindsight is 20/20.</p>
           <p>Well, that re-iterated the hard earned rule. Never underestimate integration. Also,  never underestimate integration. Have I mentioned that before?</p>
           
         </div>
         
+        <div id='gotcha-description' style='display:none;'>
+          <h4>Gotcha!</h4>
+          <p>You have a board like the one below. You may move any of your stack of pieces in any
+           direction on the board, leaving 1 behind, then 2 then the remaining pieces behind.</p>
+           <p>If your opponent cannot make a move, you win!</p>
+           
+           <div class='gotcha-board' id='gotcha-board'>
+              <div class='gotcha-board-row'>
+                <div class='gotcha-board-header'></div>
+                <div class='gotcha-board-header'>A</div>
+                <div class='gotcha-board-header'>B</div>
+                <div class='gotcha-board-header'>C</div>
+                <div class='gotcha-board-header'>D</div>
+              </div>
+              <div class='gotcha-board-row'>
+                <div class='gotcha-board-header'>1</div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+              </div>
+              <div class='gotcha-board-row'>
+                <div class='gotcha-board-header'>2</div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+              </div>
+              <div class='gotcha-board-row'>
+                <div class='gotcha-board-header'>3</div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+              </div>
+              <div class='gotcha-board-row'>
+                <div class='gotcha-board-header'>4</div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+                <div class='gotcha-board-cell'></div>
+              </div>
+           </div>
+        </div>
       </div>
       
 
@@ -221,5 +282,6 @@
 
   </body>
   <script src="js/js.js" type="text/javascript"></script>
+  <script src="js/GotchaEngine.js" type="text/javascript"></script>
 
 </html>

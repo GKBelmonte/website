@@ -310,31 +310,6 @@ String.prototype.indexOfMultiple=function(Arr)
 	return min;
 }
 
-function RegisterKonamiCode( foo )
-{
-    if ( window.addEventListener ) 
-		{
-			var InsertedKeys = [];
-			var konami = "38,38,40,40,37,39,37,39,66,65";
-			window.addEventListener("keydown", 
-        function(e)
-        {
-          if(InsertedKeys.length > 10)
-            InsertedKeys.splice(0,1);
-          InsertedKeys.push( e.keyCode );
-          if ( InsertedKeys.toString().indexOf( konami ) >= 0 )
-          {	
-            foo();
-          }
-          console.log(e.keyCode);
-        }, 
-			true);
-        return true;
-        
-		}
-      return false;
-}
-
 String.prototype.replaceAt=function(index,string, len) 
 {
   if(len == undefined)
@@ -371,6 +346,31 @@ Worker.prototype.PostMessageToEngine = function(message)
 	this.postMessage(message);
 }
 
+
+function RegisterKonamiCode( foo )
+{
+    if ( window.addEventListener ) 
+		{
+			var InsertedKeys = [];
+			var konami = "38,38,40,40,37,39,37,39,66,65";
+			window.addEventListener("keydown", 
+        function(e)
+        {
+          if(InsertedKeys.length > 10)
+            InsertedKeys.splice(0,1);
+          InsertedKeys.push( e.keyCode );
+          if ( InsertedKeys.toString().indexOf( konami ) >= 0 )
+          {	
+            foo();
+          }
+          console.log(e.keyCode);
+        }, 
+			true);
+        return true;
+        
+		}
+      return false;
+}
 
 
 /**
@@ -447,3 +447,31 @@ self.onmessage = function (e) {
 };
 
 
+
+/*
+function countMyself() {
+    // Check to see if the counter has been initialized
+    if ( typeof countMyself.counter == 'undefined' ) {
+        // It has not... perform the initialization
+        countMyself.counter = 0;
+    }
+
+    // Do something stupid to indicate the value
+    alert(++countMyself.counter);
+}
+
+If you call that function several time, you'll see the counter is being incremented.
+
+And this is probably a much better solution than poluting the global namespace with a global variable.
+
+
+And here is another possible solution, based on a closure : Trick to use static variables in javascript :
+
+var uniqueID = (function() {
+   var id = 0; // This is the private persistent value
+   // The outer function returns a nested function that has access
+   // to the persistent value.  It is this nested function we're storing
+   // in the variable uniqueID above.
+   return function() { return id++; };  // Return and increment
+})(); // Invoke the outer function after defining it.
+*/

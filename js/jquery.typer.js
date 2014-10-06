@@ -29,12 +29,13 @@ String.prototype.rightChars = function(n){
   var
     options = {
       highlightSpeed    : 1,
-      typeSpeed         : 2, //inversely proportional to the number
+      typeSpeed         : 4, //inversely proportional to the number
       clearDelay        : 1,
       typeDelay         : 2,
       clearOnHighlight  : true,
       typerDataAttr     : 'data-typer-targets',
-      typerInterval     : 50
+      typerInterval     : 50,
+      stopCursor : false
     },
     highlight,
     clearText,
@@ -78,6 +79,7 @@ String.prototype.rightChars = function(n){
   };
 
   type = function ($e) {
+    $.typer.options.stopCursor = true;
     var
       // position = $e.data('typePosition'),
       text = $e.data('text'),
@@ -90,6 +92,7 @@ String.prototype.rightChars = function(n){
 
     if (!text || text.length === 0) {
       clearData($e);
+      $.typer.options.stopCursor = false;
       return;
     }
 
@@ -111,6 +114,7 @@ String.prototype.rightChars = function(n){
     setTimeout(function () {
       type($e);
     }, getTypeInterval());
+    
   };
 
   clearText = function ($e) {
@@ -247,7 +251,7 @@ String.prototype.rightChars = function(n){
 
     $e.data({
       oldLeft: currentText.substring(0, i),
-      oldRight: currentText.rightChars(j - 1),
+      oldRight: "",// currentText.rightChars(j - 1),
       leftStop: i,
       rightStop: currentText.length - j,
       primaryColor: $e.css('color'),
@@ -280,5 +284,9 @@ String.prototype.rightChars = function(n){
 
   typerInterval = function () {
     return $.typer.options.typerInterval;
+  };
+  
+  setStopCursor = function (to) {
+    $.typer.options.stopCursor = to;
   };
 })(jQuery);

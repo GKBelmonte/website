@@ -18,8 +18,11 @@ function OnMessage (data)
 }
 
 function cursify() {
+ if(!$.typer.options.stopCursor)
+ {
   $('.cursor').fadeIn(395);
   $('.cursor').fadeOut(395);
+ }
 } 
 
 var ev2;
@@ -28,7 +31,7 @@ function Initialize(arg1)
   ProcessEngine = CreateBackgroundEngine("js/background.js", 
   OnMessage,
   false);
-
+  
 	
   
   $('.parameter-section p').click( ToggleVisibilityClick  );
