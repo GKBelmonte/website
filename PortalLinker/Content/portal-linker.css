@@ -1,0 +1,71 @@
+.portal-entry {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.6em;
+}
+
+.portal-entry-add input[type="number"] {
+    width: 5em;
+    color: black;
+}
+
+.portal-entry button {
+    background: #65655c;
+    border-radius: 0.8em;
+    margin-left: 1em;
+}
+
+.portal-entry-add span {
+    padding-right: 0.3em;
+    margin-left: 0.5em;
+}
+
+.portal-coord sub {
+    font-size: 0.7em;
+}
+
+svg.portal-arrow {
+    overflow: visible; 
+    position: absolute;
+}
+
+svg.portal-arrow path{ 
+    stroke-width: 1.25px; 
+    fill: none; 
+    
+}
+
+svg.portal-arrow-Overworld path,
+svg.portal-arrow-Overworld defs marker path{
+    stroke:#79f3f1; 
+    fill:#79f3f1;
+    marker-end: url(#Overworld-arrow);
+}
+
+svg.portal-arrow-Nether path,
+svg.portal-arrow-Nether defs marker path{
+    stroke:red; 
+    fill:red;
+    marker-end: url(#Nether-arrow);
+}
+
+span.portal-coord {
+    margin-left: 1em;
+}
+
+/*Override*/
+.med-section {
+    max-width: 860px;
+}
+
+.tooltiptext {
+  display: none;
+}
+
+.tooltipcontainer:hover {
+    color: blue;
+}
+
+.tooltipcontainer:hover + .tooltiptext {
+  visibility: visible;
+}

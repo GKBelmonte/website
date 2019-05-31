@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta content="text/html; charset=us-ascii" http-equiv="content-type" />
+
+    <link href="../Content/bootstrap.css" type="text/css" rel="stylesheet" />
+    <link href="../Content/meditations.css" type="text/css" rel="stylesheet" />
+    <link href="../Content/portal-linker.css" type="text/css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Atomic+Age|Source+Code+Pro:600" rel="stylesheet" />
+    <!-- <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Philosopher" /> -->
+
+    <!-- <script src="../Scripts/jquery-3.2.1.js" type="text/javascript"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../Scripts/meditations.js" type="text/javascript"></script>
+    <script src="../Scripts/portal-link.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        //Make all hyperlinks in new page except if they refer
+        // to something local
+        $("#all-content a").not("[href^='#']").attr("target", "_new");
+    </script>
+    
+    <title></title>
+</head>
+<body>
+    <div id="all-content">
+        <div class="med-title med-section"><a name="title"></a>Nether Portal Linking</div>
+        
+        <div class="container-fluid med-section">
+            <div class="col-sm-6 med-col">
+                <h1><a name="overworld"></a>Overworld</h1>
+                <div class="med-section row portal-holder-overworld" >
+                    
+                    <div class="portal-entry portal-entry-add" class="center-horizontal">
+                        <span>x:</span><input type="number" />
+                        <span>z:</span><input type="number" />
+                        <span>y:</span><input type="number" />
+                        <button type="button" onclick="AddPortal(this, 'Overworld')">+</button>
+                    </div>
+                </div>
+
+                
+            </div>
+            <div class="portal-arrows"> 
+                <!-- <svg class="portal-arrow" width="306" height="100" style="top: 90.3907px; left: 415px;"> -->
+
+                    <!-- <defs> -->
+                        <!-- <marker id="arrow" markerWidth="13" markerHeight="13" refX="2" refY="6" orient="auto"> -->
+                            <!-- <path d="M2,2 L2,11 L10,6 L2,2"></path> -->
+                        <!-- </marker> -->
+                    <!-- </defs> -->
+
+                    <!-- <path d="M-50,0 L60,52"> -->
+                    <!-- </path> -->
+
+                <!-- </svg> -->
+            </div>
+
+            <div class="col-sm-6 med-col">
+                <h1><a name="nether"></a>Nether</h1>
+                <div class="med-section row portal-holder-nether" >
+                    
+                    <div class="portal-entry portal-entry-add" class="center-horizontal">
+                        <span>x:</span><input type="number" onclick=""/>
+                        <span>z:</span><input type="number" onclick=""/>
+                        <span>y:</span><input type="number" onclick=""/>
+                        <button type="button" onclick="AddPortal(this, 'Nether')">+</button>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>

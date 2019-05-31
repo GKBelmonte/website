@@ -231,3 +231,29 @@ height:10px;
     font-style: oblique;
     font-weight: 900;
 }
+
+
+.gotcha-board{
+    height: 300px;
+    width: 300px;
+}
+.gotcha-board-row{   
+    width: 300px;
+    height: 60px;}
+.gotcha-board-header
+{
+    color: #B0B0B0;
+    float: left;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    width: 60px;
+}
+.gotcha-board-cell {
+    float: left;
+    height: 54px;
+    width: 54px;
+    border: 3px;
+    border-color: #b0b0b0;
+    border-style: ridge;
+}
