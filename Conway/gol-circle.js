@@ -274,11 +274,6 @@ function LoadRange()
 
 }
 
-
-
-
-
-
 function FiniteStateArithmeticTable( numberBase, inputs)
 {
 	//rows = numberBase ^ inputs
@@ -311,5 +306,5 @@ function NumberToBaseArr(number,base, digits)
 	return res.reverse();
 }
 
-$(document).load(Initialize(0));
+$(document).ready(() => Initialize(0));
 

@@ -1,48 +1,43 @@
-body
-{
-  background-color: #16161D !important; 
+:root {
+    --eigengrau: #16161D;
+    --lucky7: #777777;
 }
 
-.allContainer{
+body {
+    background-color: var(--eigengrau) !important;
+}
+
+.gkb {
+    font-family: Cambria,Georgia,serif;
+}
+
+.allContainer {
   margin-left: 10%;
   width: 80%;
-  float:left;
-  min-width: 915px;
+  min-width: 300px;
 }
 
-.description
-{
-	margin-top: 30px;
-	margin-left: 8%;
-	width: 70%;
-	float: left;
+.description {
+    margin-top: 30px;
+    margin-left: 8%;
+    width: 70%;
+    float: left;
 }
-.title
-{
+
+.title {
   margin-top: 50px;
   width: 100%;
-  height: 150px;
+  margin-bottom: 15px;
 }
-
 
 .title h1 {
     color: #666666;
-    float: right;
-    font-size: 70px;
+    font-size: 5vw;
     margin-top: 60px;
-    width: 78%;
 }
 
-.title img
-{
-  width:22%;
-  float:left;
-}
-
-.divider-container
-{
-  width:100%;
-  float:left;
+.title img {
+    width: 100%
 }
 
 .project-label {
@@ -59,24 +54,21 @@ body
     width: 33%;
 }
 
-.display
-{
+.display {
   margin-top: 50px;
   width:67%;
   float:left;
   min-height: 700px;
 }
 
-.display p
-{
+.display p {
   color: #808080;
 }
-.select
-{
+
+.select {
   margin-bottom: 20px;
   
 }
-
 
 .select-label {
     position: relative;
@@ -85,48 +77,38 @@ body
     cursor: pointer;
 }
 
-
-
-.graph
-{
+.graph {
   height: 350px;
 }
 
-.parameters-label
-{
+.parameters-label {
   margin-top: 15px;
 }
 
-.all-parameters
-{
-  width:100%;
-  float:left;
-}
-.section-collapse
-{color: #CC0000;
-cursor: pointer;}
-
-.section-expand
-{color: #3B8B35;cursor: pointer;}
-
-.parameter-section-row
-{
-float: left;
-width: 100%;
-margin-bottom: 23px;
+.section-collapse {
+  color: #CC0000;
+  cursor: pointer;
 }
 
-.parameter-section-row p
-{
-color: #777777;
+.section-expand { color: #3B8B35; cursor: pointer; }
+
+.gkb-about-row {
+    margin-bottom: 5px;
+    padding-left: 2em;
 }
+
+.gkb p {
+    margin-bottom: unset;
+    color: var(--lucky7);
+}
+
   
-.parameter-section
-{
+.parameter-section {
   margin-top:20px;  
   width:33%;
   float:left;
 }
+
 .parameter-section p { 
     
     font-family: Verdana;
@@ -134,13 +116,11 @@ color: #777777;
     font-style: italic;
 }
 
-
 .parameter-control-container
 {
   float: left;
   width:100%;
 }
-
 
 .parameter-control-container li {
     float: left;
@@ -154,45 +134,40 @@ color: #777777;
   background-color: #e5e5e5;
 }
 
-
 .parameter-control {
     float: left;
     margin-bottom: 4px;
     width: 100%;
 }
 
-.parameter-control span
-{
+.parameter-control span {
   float:left;
-
 }
 
-
-.parameter-control-label
-{
-padding-right:5px;
-padding-top:5px;
+.parameter-control-label {
+    padding-right:5px;
+    padding-top:5px;
 }
 
 .input-group {
-position: relative;
-display: table;
-border-collapse: separate;
-width:53%;
-margin-right:5%;
-float:right;
+    position: relative;
+    display: table;
+    border-collapse: separate;
+    width:53%;
+    margin-right:5%;
+    float:right;
 }
 .input-group *
 {height: 20px;}
 
 .input-group input{
-position: relative;
-display: table;
-border-collapse: separate;
-margin-bottom: 0;
-float:left;
-border-radius: 4px 0 0 4px;
-width:50%;
+    position: relative;
+    display: table;
+    border-collapse: separate;
+    margin-bottom: 0;
+    float:left;
+    border-radius: 4px 0 0 4px;
+    width:50%;
 }
 
 .input-group-addon {
@@ -226,22 +201,22 @@ height:10px;
   float:right;
 }
 
-.cursor{
-  font-size: larger;
-    font-style: oblique;
+.cursor {
+    font-size: larger;
     font-weight: 900;
 }
 
 
-.gotcha-board{
+.gotcha-board {
     height: 300px;
     width: 300px;
 }
-.gotcha-board-row{   
+.gotcha-board-row {   
     width: 300px;
-    height: 60px;}
-.gotcha-board-header
-{
+    height: 60px;
+}
+
+.gotcha-board-header {
     color: #B0B0B0;
     float: left;
     height: 60px;
@@ -249,6 +224,7 @@ height:10px;
     line-height: 60px;
     width: 60px;
 }
+
 .gotcha-board-cell {
     float: left;
     height: 54px;
@@ -256,4 +232,21 @@ height:10px;
     border: 3px;
     border-color: #b0b0b0;
     border-style: ridge;
+}
+
+/* Bootstrap overrides */
+
+.col,
+.col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9,
+.col-auto,
+.col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9,
+.col-lg-auto, .col-md,
+.col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9,
+.col-md-auto, .col-sm,
+.col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9,
+.col-sm-auto,
+.col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9,
+.col-xl-auto {
+    padding-right : 0;
+    padding-left: 0;
 }

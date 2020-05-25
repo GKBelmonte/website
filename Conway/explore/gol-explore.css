@@ -1,0 +1,111 @@
+.allContainer {
+  margin-left: 8%;
+  width: 45%;
+  float: left;
+}
+
+#text-in {
+  width: 45%;
+}
+
+#text-out {
+  width: 50%;
+}
+
+#Execute {
+  width: 100px
+}
+
+.cell {
+  border-style: solid;
+  border-width: 1px;
+  float: left;
+  height: 10px;
+  width: 10px;
+}
+
+.state {
+  height: 20px;
+}
+
+.state-label {
+  height: 20px;
+  width: 540px;
+}
+
+.truth-tables {
+  margin-left: 8%;
+  width: 20%;
+  float: left;
+}
+
+.truth-table {
+  height: 280px;
+  width: 100px;
+  padding-top: 20px;
+  padding-right: 20px;
+}
+
+.truth-table-mob {
+  background: none repeat scroll 0 0 white;
+  border-style: solid;
+  border-width: 1px;
+  height: 238px;
+  left: 205px;
+  padding-left: 10px;
+  padding-right: 0;
+  padding-top: 10px;
+  position: absolute;
+  top: 20px;
+  width: 92px;
+}
+
+.truth-table-row {
+  height: 25px;
+  width: 60px;
+  ;
+  float: left;
+}
+
+.truth-table-head {
+  height: 30px;
+  width: 80px;
+  ;
+  float: left;
+}
+/*truth table row cell*/
+.ttrc {
+  height: 15px;
+  width: 15px;
+  float: left;
+}
+/*truth table row value*/
+.ttrv {
+  height: 15px;
+  width: 15px;
+  float: left;
+}
+/*truth table row input*/
+.ttri {
+  height: 24px;
+  width: 40px;
+  float: left;
+}
+/*truth table row input text*/
+.ttrit {
+  height: 21px;
+  width: 38px;
+  float: left;
+}
+
+.load-range-tb {
+  height: 21px;
+  width: 38px;
+}
+
+.description {
+  margin-top: 30px;
+  margin-left: 8%;
+  width: 45%;
+  float: left;
+}

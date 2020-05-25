@@ -292,5 +292,5 @@ function NumberToBaseArr(number,base, digits)
 	return res.reverse();
 }
 
-$(document).load(Initialize(0));
+$(document).ready(() => Initialize(0));
 

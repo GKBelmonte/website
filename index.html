@@ -1,47 +1,45 @@
 <!DOCTYPE html>
 <html>
-  <head>
-		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-		<title>Gabriel Belmonte's  Site</title> 
-    <script src="js/jquery.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/jquery.typer.js"></script>
-    <!--<script type="text/javascript"  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    -->
-    <link rel='stylesheet' href='bootstrap/css/bootstrap.min.css' />
-    <link rel='stylesheet' href='css/css.css' />
-		<style type="text/css">    </style>
-	</head> 
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Gabriel Belmonte's Site</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!--<script src="js/jquery.js"></script>-->
+  <script src="js/utils.js"></script>
+  <script src="js/jquery.typer.js"></script>
+  <!--
+      <script type="text/javascript"  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous" />
+  <link rel='stylesheet' href='css/css.css' />
+  <style type="text/css">
+  </style>
+</head> 
   
   
 	<body style="cursor: auto;"> 
 
-    <div class="allContainer">
-      <div class="title">
-        <img src="img/phoenix.png" alt="logo"/>
-        <h1 class='text-right'>Gabriel Belmonte</h1>
+    <div class="allContainer container gkb">
+      <div class="title row">
+        <div class="col-sm-5"><img src="img/icon1.png" alt="logo" /></div>
+        <h1 class='col-sm-7 text-center'>Gabriel Belmonte</h1>
       </div>
-      <h3 class="parameters-label section-expand" speed='400' >+ About me</h3 >
-      <div class="all-parameters" style='display:none;'>
-        
-        
+      <h3 class="section-expand row" speed='400' >+ About me</h3 >
+      <div class="gkb-about-row row" style='display:none;'>
+
         <!-- ******************* ROW 0 ******************* -->
-       
-        
-        <div class="parameter-section-row">
-
-          <p>Hi there! My name is Gabriel Belmonte. I am recent Computer Engineering graduate from
-          Concordia University. This is where I will create my website when work,
-          and side projects give me the chance to execute this awesome task :) </p>
-          <p></p>
-
+        <div>
+            <p> Hi there! My name is Gabriel Belmonte. <br /> 
+            I am a Computer Engineering graduate from Concordia University. </p>
         </div>
-         
       </div>
-      <div class='divider-container'>
-      <li class='divider'></li>
+
+      <div class='row'>
+        <li class='divider col-sm-12'></li>
       </div>
-      <h3 class="project-label" >Projects</h3 >
+      <div class='row'>
+        <h3 class="project-label col-sm-12">Projects</h3>
+      </div>
       
       <div class="dock">
         <div class="select">
@@ -84,7 +82,7 @@
           </p>
         </div>
         <div id='conway-description' style='display:none;'>
-          <h4> Conway's <a href='Conway/index.html'>Game of Life</a>! </h4>
+          <h4> Conway's <a href='Conway/gol-circle.html'>Game of Life</a>! </h4>
           <p>The simple code in the page allows you to try out
           what a one-dimensional version of Conway's Game of Life would be like.
           Except you pick your own rules.
@@ -99,7 +97,7 @@
             Play with it and see what you can make :)
           </p>
           
-          <p>(also see <a href='Conway/explore/index.html'>this one</a> for an explorative version)</p>
+          <p>(also see <a href='Conway/explore/gol-explore.html'>this one</a> for an explorative version)</p>
           <h5>About the Game of Life</h5>
           <p>The <a href='http://www.math.com/students/wonders/life/life.html'>Game of Life</a> is particularly well known among geeks. It's a zero-player game,
           where once the initial conditions are set, the destiny of all things will naturally unfold. 
