@@ -41,11 +41,8 @@ function Initialize(arg1)
         function (e)
         {
               selected = $(e.target).attr('id');
-  
               $('#dock-description').typeTo( $('#' + selected + '-description').html() );
-        
         }
-    
       );
   
       setInterval ( cursify, 800 );

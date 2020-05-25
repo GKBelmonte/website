@@ -47,27 +47,12 @@ body {
     text-align: center;
 }
 
-.dock {
-    float: left;
-    margin-top: 50px;
-
-    width: 33%;
-}
-
-.display {
-  margin-top: 50px;
-  width:67%;
-  float:left;
-  min-height: 700px;
-}
-
 .display p {
   color: #808080;
 }
 
 .select {
   margin-bottom: 20px;
-  
 }
 
 .select-label {
