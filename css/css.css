@@ -5,6 +5,7 @@
 
 body {
     background-color: var(--eigengrau) !important;
+    overflow: hidden;
 }
 
 .gkb {
@@ -12,20 +13,26 @@ body {
 }
 
 .allContainer {
-  margin-left: 10%;
-  width: 80%;
+  margin-left: 5%;
   min-width: 300px;
+  max-width: unset;
+  width: 90%;
+  height: 100%;
+}
+
+.main-row {
+  height: 66vh;
 }
 
 .description {
-    margin-top: 30px;
-    margin-left: 8%;
-    width: 70%;
-    float: left;
+  margin-top: 30px;
+  margin-left: 8%;
+  width: 70%;
+  float: left;
 }
 
 .title {
-  margin-top: 50px;
+  margin-top: 15px;
   width: 100%;
   margin-bottom: 15px;
 }
@@ -33,18 +40,18 @@ body {
 .title h1 {
     color: #666666;
     font-size: 5vw;
-    margin-top: 60px;
+    margin-top: 30px;
 }
 
 .title img {
-    width: 100%
+    width: 100%;
 }
 
 .project-label {
-    color: #808080;
-    font-size: 40px;
-    margin-top: 50px;
-    text-align: center;
+  color: #808080;
+  font-size: 40px;
+  margin-top: 7px;
+  text-align: center;
 }
 
 .display p {
@@ -76,6 +83,16 @@ body {
 }
 
 .section-expand { color: #3B8B35; cursor: pointer; }
+
+.about-section-expanded {
+  color: #CC0000;
+  cursor: pointer;
+}
+
+.about-section-collapsed {
+  color: #3B8B35;
+  cursor: pointer;
+}
 
 .gkb-about-row {
     margin-bottom: 5px;
@@ -142,8 +159,7 @@ body {
     margin-right:5%;
     float:right;
 }
-.input-group *
-{height: 20px;}
+.input-group * { height: 20px; }
 
 .input-group input{
     position: relative;
@@ -219,6 +235,25 @@ height:10px;
     border-style: ridge;
 }
 
+/*mobile / narrow */
+@media (max-width: 576px) { /* same as bootstraps*/
+  .main-row {
+    height: auto;
+  }
+
+  body {
+    overflow-y: auto;
+  }
+
+  #impress {
+    height: 100px;
+  }
+
+  .main-content {
+    height: 500px;
+  }
+}
+
 /* Bootstrap overrides */
 
 .col,
@@ -234,4 +269,38 @@ height:10px;
 .col-xl-auto {
     padding-right : 0;
     padding-left: 0;
+}
+
+/* impress*/
+#impress {
+  /* Need to make the "view-port" fixed height so we have no scaling blur
+    Must match the one configured
+  */
+  width: 100%; 
+  height: 100%;
+}
+
+
+#impress > div {
+  width: 100%;
+  height: 100%;
+}
+
+.step.slide {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.step.slide.present {
+  overflow: auto;
+}
+
+/*debug*/
+/*.step.slide {
+  border: white;
+  border-style: dashed;
+}
+*/
+.impress-row {
 }

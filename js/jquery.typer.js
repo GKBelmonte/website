@@ -28,10 +28,10 @@ String.prototype.rightChars = function(n){
 (function($) {
   var
     options = {
-      highlightSpeed    : 1,
-      typeSpeed         : 4, //inversely proportional to the number
-      clearDelay        : 1,
-      typeDelay         : 2,
+      highlightSpeed    : 60,
+      typeSpeed         : 'auto', //actually typeInterval, the higher the interval the lower the speed
+      clearDelay        : 30,
+      typeDelay         : 20,
       clearOnHighlight  : true,
       typerDataAttr     : 'data-typer-targets',
       typerInterval     : 50,
@@ -84,7 +84,8 @@ String.prototype.rightChars = function(n){
       // position = $e.data('typePosition'),
       text = $e.data('text'),
       oldLeft = $e.data('oldLeft'),
-      oldRight = $e.data('oldRight');
+      oldRight = $e.data('oldRight'),
+      typeInterval =  $e.data('typeInterval');
 
     // if (!isNumber(position)) {
       // position = $e.data('leftStop');
@@ -113,7 +114,7 @@ String.prototype.rightChars = function(n){
 
     setTimeout(function () {
       type($e);
-    }, getTypeInterval());
+    }, typeInterval);
     
   };
 
@@ -125,8 +126,6 @@ String.prototype.rightChars = function(n){
     }, typeDelay());
   };
 
-  
-  
   
   highlight = function ($e) {
     var
@@ -256,7 +255,8 @@ String.prototype.rightChars = function(n){
       rightStop: currentText.length - j,
       primaryColor: $e.css('color'),
       backgroundColor: $e.css('background-color'),
-      text: newString
+      text: newString,
+      typeInterval: getTypeInterval(newString.length)
     });
 
     highlight($e);
@@ -270,8 +270,16 @@ String.prototype.rightChars = function(n){
     return $.typer.options.highlightSpeed;
   };
 
-  getTypeInterval = function () {
-    return $.typer.options.typeSpeed;
+  getTypeInterval = function (l) {
+
+    let typeInterval = $.typer.options.typeSpeed;
+    if (typeof (typeInterval) === "number")
+      return typeInterval;
+    // lets say 256 => 64
+    typeInterval = 16384 / Math.max(l, 1);
+    //no more than 1s and no less than 1ms
+    typeInterval = Math.min(Math.max(typeInterval, 1),  1000);
+    return typeInterval;
   },
 
   clearDelay = function () {

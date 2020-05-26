@@ -60,43 +60,55 @@ Assumes the following css
 
 function _toggleVisibility( target )
 {
-    var now = target.next().css('display');
-    var speed = target.attr('speed');
-    if(now != 'none')
-    {
-        target.removeClass('section-collapse')
-        target.addClass('section-expand');
-        target.next().hide( speed == undefined? 0 : parseInt(speed));
-        target.html(target.html().replaceAll('-','+'));
+  let now = target.next().css('display');
+  let speed = target.attr('speed');
+  let expandLag = target.attr('expand-lag');
+  let collapseLag = target.attr('collapse-lag');
+  if(now !== 'none')
+  {
+    //collapse
+    target.removeClass('section-collapse')
+    target.addClass('section-expand');
+    target.addClass('section-collapsing');
+    if (typeof (collapseLag) !== 'undefined') {
+      setTimeout(() => collapse(target, speed), parseInt(collapseLag));
     }
-    else
-    {
-        target.addClass('section-collapse')
-        target.removeClass('section-expand');
-        target.next().show( speed == undefined? 0 : parseInt(speed));
-        target.html(target.html().replaceAll('\\+','-')); // plus is a regex expression reserved character. we must escape it
+    else {
+      collapse(target, speed);
     }
+  }
+  else {
+    //expand
+    target.addClass('section-collapse');
+    target.removeClass('section-expand');
+    target.addClass('section-expanding');
+    if (typeof (expandLag) !== 'undefined') {
+      setTimeout(() => expand(target, speed), parseInt(expandLag));
+    }
+    else {
+      expand(target, speed);
+    }
+  }
 }
-/*
-function _toggleVisibility( target )
-{
-    var now = target.next().css('display');
-    var speed = target.attr('speed');
-    if(now != 'none')
-    {
-        target.removeClass('section-collapse')
-        target.addClass('section-expand');
-        target.next().css('display','none');
-        target.html(target.html().replaceAll('-','+'));
-    }
-    else
-    {
-        target.addClass('section-collapse')
-        target.removeClass('section-expand');
-        target.next().css('display','block');
-        target.html(target.html().replaceAll('\\+','-')); // plus is a regex expression reserved character. we must escape it
-    }
-}*/
+
+function expand(target, speed) {
+  
+  target.next().show(speed == undefined ? 0 : parseInt(speed), () => {
+    target.removeClass('section-expanding');
+    target.addClass('section-expanded');
+  });
+  target.html(target.html().replaceAll('\\+', '-')); // plus is a regex expression reserved character. we must escape it
+}
+
+function collapse(target, speed) {
+  
+  target.next().hide(speed == undefined ? 0 : parseInt(speed), () => {
+    target.removeClass('section-collapsing');
+    target.addClass('section-collapsed');
+  });
+  target.html(target.html().replaceAll('-', '+'));
+}
+
 
 
 /*
@@ -113,7 +125,7 @@ function ToggleVisibilityOnClick(e)
 */
 function ToggleVisibilityClick(e)
 {
-    var target = $(e.target);
+    var target = $(e.currentTarget);
     _toggleVisibility(target);
 }
 
