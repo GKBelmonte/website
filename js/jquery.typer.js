@@ -92,6 +92,9 @@ String.prototype.rightChars = function(n){
     // }
 
     if (!text || text.length === 0) {
+      let f = $e.data('onTypeComplete')
+      if (f !== null)
+        f($e);
       clearData($e);
       $.typer.options.stopCursor = false;
       return;
@@ -120,7 +123,9 @@ String.prototype.rightChars = function(n){
 
   clearText = function ($e) {
     $e.find('span').remove();
-
+    let f = $e.data('onClearComplete')
+    if (f !== null)
+      f();
     setTimeout(function () {
       type($e);
     }, typeDelay());
@@ -219,7 +224,7 @@ String.prototype.rightChars = function(n){
     });
   };
 
-  $.fn.typeTo = function (newString) {
+  $.fn.typeTo = function (newString, onClearComplete, onTypeComplete) {
     var
       $e = $(this), //$e is the element/elements matched by jquery
       currentText = $e.html(),
@@ -256,7 +261,9 @@ String.prototype.rightChars = function(n){
       primaryColor: $e.css('color'),
       backgroundColor: $e.css('background-color'),
       text: newString,
-      typeInterval: getTypeInterval(newString.length)
+      typeInterval: getTypeInterval(newString.length),
+      onClearComplete: onClearComplete || null,
+      onTypeComplete: onTypeComplete || null
     });
 
     highlight($e);

@@ -103,16 +103,24 @@ function initImpress() {
 function aboutExpandCollapse(e) {
   let target = $('#gkb-about-me');
 
-  let collapsing = $(e.currentTarget).hasClass('about-section-expanded');
+  let collapsing = $(e.currentTarget).hasClass('section-collapsing');//$(e.currentTarget).hasClass('about-section-expanded');
   if (collapsing) {
-    target.typeTo("");
+    target.typeTo("", () => clearComplete(), () => typeComplete());
   }
   else {
     setTimeout(() => {
-      target.typeTo($('#gkb-about-me-content').html());
+      target.typeTo($('#gkb-about-me-content').html(), () => clearComplete(), () => typeComplete());
       cursify();
     }, 100);
   }
+}
+
+function clearComplete() {
+  console.log('clear complete');
+}
+
+function typeComplete() {
+  console.log('type complete');
 }
 
 $(document).ready(() => Initialize(0));
