@@ -54,11 +54,14 @@ function Initialize(arg1)
 
   $('.select span').click((e) => {
     let id = e.target.id
-    let target = $(`#${id}-description`)[0];
-    site.impress.goto(target);
+    let target = $(`#${id}-description`);
+    site.impress.goto(target[0]);
+    if (!site.impressSwitch.checked)
+      $('#impress-fallback').html(target.html());
   });
   
   RegisterKonamiCode(function() {} );
+
   setTimeout(function () {
     $('#dock-description').typeTo($('#DescriptionDefault').html())
   }, 200);
@@ -66,7 +69,26 @@ function Initialize(arg1)
   $.getJSON("spherePackedPoints.json", (d) => {
     site.spherePackedPoints = d;
     initImpress();
-    });
+  });
+
+  //handle switch between impress and not impress
+  site.impressSwitch = $('#impress-switch input')[0];
+  $('#impress-switch').click(() => {
+    if (site.impressSwitch.checked) {
+      $('#impress').show();
+      $('#impress-fallback').hide();
+    }
+    else {
+      $('#impress').hide();
+      $('#impress-fallback').show();
+    }
+  });
+
+  //keep fallback in sync
+  $(document).on('impress:stepenter', (e) => {
+    if (site.impressSwitch.checked)
+      $('#impress-fallback').html($(e.target).html());
+  });
 }
 
 function initImpress() {
