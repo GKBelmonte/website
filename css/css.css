@@ -332,10 +332,10 @@ height:10px;
 }
 
 /*debug*/
-.step.slide, #impress-fallback {
+/*.step.slide, #impress-fallback {
   border: white;
   border-style: dashed;
-}
+}*/
 
 .impress-row {
 }
