@@ -14,6 +14,8 @@
  *  version: 1.0.0-beta1
  *  url:     http://bartaz.github.com/impress.js/
  *  source:  http://github.com/bartaz/impress.js/
+ *  
+ *  (version has been customized for gkbelmonte site
  */
 
 // You are one of those who like to know how things work inside?
@@ -3716,7 +3718,7 @@
          } else {
 
              // No movement - move (back) to the current slide
-             window.impress().goto( document.querySelector( "#impress .step.active" ) );
+             //window.impress().goto( document.querySelector( "#impress .step.active" ) );
          }
      } );
 
