@@ -449,7 +449,8 @@
             //
             // If you are reading this and know any better way to handle it, I'll be glad to hear
             // about it!
-            window.scrollTo( 0, 0 );
+            // for applications where we dont force the overflow to none i cant have this
+            //window.scrollTo( 0, 0 );
 
             var step = stepsData[ "impress-" + el.id ];
             duration = ( duration !== undefined ? duration : step.transitionDuration );
@@ -3699,16 +3700,14 @@
         var thresholdAnim = window.innerWidth * thresholdAnimFactor;
 
          var totalDiff = lastX - startX;
-         if (Math.abs(totalDiff) > finalThreshold && (totalDiff * lastDX) <= 0)
-         {
+         if (Math.abs(totalDiff) > finalThreshold && (totalDiff * lastDX) <= 0) {
              if (totalDiff > finalThreshold && lastDX <= 0)
              {
                  window.impress().prev();
              } else if (totalDiff < - finalThreshold && lastDX >= 0 ) {
                  window.impress().next();
              }
-         } else if (Math.abs(lastDX) > threshold)
-         {
+         } else if (Math.abs(lastDX) > threshold) {
              if (lastDX < -threshold)
              {
                  window.impress().prev();
@@ -3716,9 +3715,8 @@
                  window.impress().next();
              }
          } else {
-
              // No movement - move (back) to the current slide
-             //window.impress().goto( document.querySelector( "#impress .step.active" ) );
+             window.impress().goto( document.querySelector( "#impress .step.active" ) );
          }
      } );
 

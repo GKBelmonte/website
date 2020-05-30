@@ -52,6 +52,8 @@ function Initialize(arg1)
   //  }
   //);
 
+  initNavLabels();
+
   $('.select span').click((e) => {
     let id = e.target.id
     let target = $(`#${id}-description`);
@@ -91,11 +93,38 @@ function Initialize(arg1)
   });
 }
 
+function initNavLabels() {
+  debugger;
+  //only true before impress init
+  let steps = $("#impress > div:not('.exclude-from-auto-pos')");
+  let titles = [];
+  for (let s of steps) {
+    let step = $(s);
+    let title = step.attr('title');
+    let targetId = step.attr('id');
+    let cutAt = targetId.indexOf('-description');
+    if (cutAt === -1)
+      continue;
+    let id = targetId.substr(0, cutAt);
+    titles.push({
+      'id': id,
+      'title': title
+    });
+  }
+
+  let navPane = $('#gkb-nav-pane');
+  for (let i = titles.length - 1; i >= 0; --i) {
+    navPane.prepend(`<div class="select">
+          <span class="select-label" id='${titles[i].id}'>${titles[i].title}</span>
+        </div>`);
+  }
+}
+
 function initImpress() {
     //data-rotate-x
     //data-rotate-y
   let baseRadius = 125;
-  let steps = $("#impress > div"); //only true before impress init
+  let steps = $("#impress > div:not('.exclude-from-auto-pos')"); //only true before impress init
   let stepCount = steps.length;
   site.currentSsp = site.spherePackedPoints[stepCount];
   site.steps = steps;

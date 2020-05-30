@@ -55,15 +55,12 @@
     </div>
       
     <div class="row flex-grow-1 main-row">
-      <div class="col-sm-4">
-        <div class="select">
+      <div id="gkb-nav-pane" class="col-sm-4">
+        <!--<div class="select">
           <span class="select-label" id='ages'>Genetic algorithms and chess</span>
         </div>
         <div class="select">
-          <span class="select-label" id='conway'>1-D Conway's game of life </span>
-        </div>
-        <div class="select">
-          <span class="select-label" id='igem'>iGEM Protein Synthesis Decay </span>
+          <span class="select-label" id='conway'>Conway's game of life </span>
         </div>
         <div class="select">
           <span class="select-label" id='chordsheet'>Chordsheet </span>
@@ -77,7 +74,7 @@
 
         <div class="select">
           <span class="select-label" id='gotcha' style='display:none;'> Beat my AI! </span>
-        </div>
+        </div>-->
         
         <div id="impress-switch" class="switch-container">
           <label class="switch">
@@ -91,7 +88,12 @@
 
       <div class="col-sm-8 main-content">
         <div id="impress" data-width="777" data-height="777" data-fixedScale="1">
-          <div id='hello-world' data-scale="1">
+          
+          <div id='start' class='step slide exclude-from-auto-pos' data-scale="5" data-x="0" data-y="0" data-z="0">
+            
+          </div>
+
+          <div id='hello-world' data-scale="1" title="Hello, World">
             <div>
               HELLO WORLD
               <p>
@@ -101,16 +103,8 @@
             </div>
           </div>
 
-          <div id='igem-description' data-x="-100" data-y="-100" data-z="0" data-rotate-x="70">
-            <div>
-              <p>
-                iGEM Protein synthesis/decay <a href='ProteinSynthesis/index.html'>project</a> for
-                <a href='http://2013.igem.org/Main_Page'>iGEM competition 2013</a> .
-              </p>
-            </div>
-          </div>
-
-          <div id='conway-description' data-x="500" data-y="500" data-z="0" data-rotate-y="70" data-scale="1">
+          <div id='conway-description' data-x="500" data-y="500" data-z="0" data-rotate-y="70" data-scale="1" 
+               title="Conway's Game of Life">
             <div>
               <h4> Conway's <a href='Conway/gol-circle.html'>Game of Life</a>! </h4>
               <p>
@@ -124,11 +118,13 @@
                 At every period, all cells will move to their next state, producing
                 interesting patterns.
               </p>
+
               <p>
                 Play with it and see what you can make :)
               </p>
 
               <p>(also see <a href='Conway/explore/gol-explore.html'>this one</a> for an explorative version)</p>
+
               <h5>About the Game of Life</h5>
               <p>
                 The <a href='http://www.math.com/students/wonders/life/life.html'>Game of Life</a> is particularly well known among geeks. It's a zero-player game,
@@ -165,10 +161,34 @@
                 (with a little exponential overhead, of course).
                 <br>This is effectively a machine capable of solving any problem any computer has ever solved.
               </p>
+
+              <h5>iGEM</h5>
+              <p>
+                During an iGem competition, a team of smart Concordian biologists tried to replicate this idea with real cells.
+              </p>
+              <p>
+                I tried helping them out by creating a simple prototype of protein synthesis and decay for the
+                <a href='http://2013.igem.org/Main_Page'>iGEM competition of 2013</a>
+              </p>
+
+              <p>
+                The idea was to bring the game of life to real live cells. The cells wouldn't live or die but would signal
+                their state to neighbour cells using protein synthesis.
+              </p>
+              <p>
+                The time it took for the protein to decay to a small enough level was basically the clock in the
+                real-life game of life.
+              </p>
+              <p>
+                Because the proteins were not restricted to only communicate with their neighbours, they had to create two
+                different set of cells
+              </p>
+
             </div>
           </div>
 
-          <div id='ht-description'>
+          <div id='ht-description'
+               title="Hammerhead Ribozymes">
             <p>
               <a href='http://en.wikipedia.org/wiki/Hammerhead_ribozyme'>Hammerhead ribozymes</a> are very neat little catalytic RNA that are capable of
               performing functions much like proteins. Specifically, they are good at killing other
@@ -179,7 +199,8 @@
             </p>
           </div>
 
-          <div id='chordsheet-description'>
+          <div id='chordsheet-description'
+               title="Chordsheet">
             <p>
               A simple guitar <a href='ChordSheet/index.html'>Chordsheet</a>.
               <br>
@@ -188,7 +209,8 @@
             </p>
           </div>
 
-          <div id='ages-description'>
+          <div id='ages-description'
+               title="Genetic Algorithms And Chess">
             <h4>Using Genetic Algorithms to <a href='ages/index.html'>evolve chess playing</a> algorithms</h4>
             <p>
               Every chess player knows a pawn is worth less than a bishop. They would gladly sacrifice a rook for queen too. But would they sacrifice two of them? Would they sacrifice all their pawns for a queen? Sure, it might be circumstantial, but how much are pieces worth
@@ -226,7 +248,8 @@
             </p>
           </div>
 
-          <div id='yhack-description'>
+          <div id='yhack-description'
+               title="YHack: Music Reverse Engineering">
             <h4>Using <a href='http://en.wikipedia.org/wiki/Fast_Fourier_transform'>DFFT</a> to reverse engineer a musical piece</h4>
             <p>
               Fancy acronyms and stuff... Really, all I was doing was writing a program that read some music file using a <a href='http://reference.wolfram.com/mathematica/tutorial/FourierTransforms.html'>powerful framework</a> to attempt
@@ -275,9 +298,9 @@
 
           </div>
 
-      <!--  TODO fix cursor 
-            add cool 3d rotating view
-        -->
+          <!--  TODO fix cursor
+        add cool 3d rotating view
+    -->
         </div>
       
         <div id="impress-fallback" style="display: none;"></div>
