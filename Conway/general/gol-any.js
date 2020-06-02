@@ -13,7 +13,6 @@ function Initialize(param) {
   site.height = 50;
   site.N = 2;
 
-  debugger;
   let state = createEmptyState();
 
   $('#play-button').click(playStop);
@@ -46,9 +45,11 @@ function createEmptyState() {
 function playStop() {
   if (site.play) {
     site.play = false;
+    $('#play-button').addClass('play-stop-button-playing');
   } else {
     site.play = true;
     setTimeout(frame, 500);
+    $('#play-button').removeClass('play-stop-button-playing');
   }
 }
 
@@ -161,10 +162,13 @@ function drawState(n, m) {
   let w = ctx.canvas.width;
   let h = ctx.canvas.height;
   //site.ctx.fillRect(1, 1, 8, 8)
+  let lastState = -1;
   for (let i = 0; i < site.width; ++i) {
     for (let j = 0; j < site.height; ++j) {
       let state = site.state[i][j];
-      setStateColor(ctx, state);
+      if (state !== lastState)
+        setStateColor(ctx, state);
+      lastState = state;
       let xStart = 10 * i + 1;
       let yStart = 10 * j + 1;
       ctx.fillRect(xStart, yStart, 8, 8); 
