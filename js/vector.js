@@ -52,20 +52,29 @@ export class Vector {
 
   getOrientationFromVector() {
     let v = this;
-    let yzProj = v.projectUntoPlane(new Vector(1, 0, 0)).normalize();
-    let xRotation = Math.atan2(yzProj.Z, yzProj.Y);
-    let xzProj = v.projectUntoPlane(new Vector(0, 1, 0)).normalize();
-    let yRotation = Math.atan2(xzProj.Z, xzProj.X);
+    //there are some special cases when y ~ 0 and z ~ 0, as
+    // we approach the poles, but we'll ignore for now
+    let xRotation = Math.atan2(-v.Y, v.Z);
+    let yRotation = Math.atan2(v.X, v.Y);
 
     return new Vector(xRotation, yRotation, 0);
+  }
+
+  getPolarCoordinates() {
+    let v = this;
+    let r = v.getLength();
+    let phi = Math.atan2(v.Y, v.X);
+    let theta = Math.acos(v.Z, );
+
+    return new Vector(r, phi, theta);
   }
 
   getOrientationFromVectorOld() {
     let v = this;
     let yzProj = v.projectUntoPlane(new Vector(1, 0, 0)).normalize();
-    let xRotation = Math.acos(yzProj.dot(new Vector(0, 0, 1)));
+    let xRotation = Math.atan2(yzProj.Z, yzProj.Y);
     let xzProj = v.projectUntoPlane(new Vector(0, 1, 0)).normalize();
-    let yRotation = Math.acos(xzProj.dot(new Vector(0, 0, 1)));
+    let yRotation = Math.atan2(xzProj.Z, xzProj.X);
 
     return new Vector(xRotation, yRotation, 0);
   }

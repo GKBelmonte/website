@@ -296,7 +296,7 @@ height:10px;
     padding-left: 0;
 }
 
-/* impress*/
+/********************  impress ********************/
 #impress {
   /* Need to make the "view-port" fixed height so we have no scaling blur
     Must match the one configured
@@ -332,7 +332,8 @@ height:10px;
 }
 
 .step.slide:not(.present) {
-  width:100%; /*dummy*/
+  width: 100%; 
+  opacity: 27%;
 }
 
 /*debug*/
@@ -344,6 +345,23 @@ height:10px;
 .impress-row {
 }
 
+
+@keyframes idle-rotating {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(-360deg);
+  }
+}
+
+.idle-rotating {
+  animation: idle-rotating 10s linear infinite;
+}
+
+.idle-rotating > div.step.slide:not(.present) {
+  opacity: 80%;  
+}
 
 /******************** Scroll Bar ********************/
 /* width */

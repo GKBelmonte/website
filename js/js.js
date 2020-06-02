@@ -87,14 +87,40 @@ function Initialize(arg1)
   });
 
   //keep fallback in sync
-  $(document).on('impress:stepenter', (e) => {
-    if (site.impressSwitch.checked)
+  $(document).on('impress:stepenter', stepEnterHandler);
+  $(document).on('impress:stepleave', stepLeaveHandler);
+}
+
+site.idleRoate = true;
+
+function stepLeaveHandler(e) {
+  switch (e.target.id) {
+    case 'start':
+      $('#impress > div').removeClass('idle-rotating');
+      //await new Promise(r => setTimeout(r, 1000));
+      break;
+    default:
       $('#impress-fallback').html($(e.target).html());
-  });
+      break;
+  }
+}
+
+function stepEnterHandler(e) {
+  
+  if (site.impressSwitch.checked) {
+    switch (e.target.id) {
+      case 'start':
+        $('#impress > div').addClass('idle-rotating');
+        break;
+      default:
+        $('#impress-fallback').html($(e.target).html());
+        break;
+    }
+  }
+
 }
 
 function initNavLabels() {
-  debugger;
   //only true before impress init
   let steps = $("#impress > div:not('.exclude-from-auto-pos')");
   let titles = [];
