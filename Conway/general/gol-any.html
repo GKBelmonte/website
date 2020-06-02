@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Gabriel Belmonte's Site</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/jquery.typer.js"></script>
+
+  <!--
+      <script type="text/javascript"  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous" />
+  <link rel='stylesheet' href='../../css/css.css' />
+  <link rel='stylesheet' href='gol-any.css' />
+</head>
+
+<body style="cursor: auto;">
+  <div class="allContainer container gkb">
+    <div class="title row">
+      <h1 class='col-sm-12 text-center'>Conway's Game Of Life</h1>
+    </div>
+    <div id="gkb-about-me-expand" class="row section-expand" speed='400' collapse-lag='2000'>
+      <h3>+ About</h3>
+    </div>
+
+    <div class="gkb-about-row row" style='display:none;'>
+
+      <!-- ******************* ROW 0 ******************* -->
+
+      <div id="gkb-about-me">
+
+      </div>
+
+      <div id="gkb-about-me-content" style="display: none;">
+      </div>
+    </div>
+
+    <div class='row'>
+      <li class='divider col-sm-12'></li>
+    </div>
+
+    <!--<div class='row'>
+    <h3 class="project-label col-sm-12">Miscellanies</h3>
+  </div>-->
+
+    <div class="row flex-grow-1 main-row">
+      <div class="col-sm-12 main-content">
+        <canvas id="gol-canvas" width="1001" height="501">
+        </canvas>
+      </div>
+    </div>
+
+    <div class="row"> 
+      <button id="play-button" class="round-button">Play</button>
+      <div id="loc"></div>
+    </div>
+    
+  </div>
+</body>
+</html>
+<footer>
+  <script src="gol-any.js" type="module"></script>
+</footer>
