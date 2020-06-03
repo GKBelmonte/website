@@ -1,4 +1,4 @@
-import { Matrix } from './matrix.js';
+import { Matrix } from './../../js/matrix.js';
 
 var site = site || {};
 
@@ -308,11 +308,7 @@ function Initialize(param) {
   site.golCanvas.mouseClick = changeState;
   site.golCanvas.mouseMove = canvasMouseMove;
 
-
   $('#play-button').click(playStop);
-  
-
-  debugger;
 
   site.state = state;
   site.play = false;
@@ -406,6 +402,7 @@ function clickPos(e) {
   let pos = findPos(this);
   let xPix = e.pageX - pos.x;
   let yPix = e.pageY - pos.y;
+  return { x: xPix, y: yPix };
 }
 
 function changeState(e) {
