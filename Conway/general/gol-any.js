@@ -78,6 +78,8 @@ class Canvas {
     this.ctx.save();
     this.ctx.translate(this.translatePos.x, this.translatePos.y);
     this.ctx.scale(this.scale, this.scale);
+    this.canvasStart = this.htmlToCanvas(0, 0);
+    this.canvasEnd = this.htmlToCanvas(this.canvas.width, this.canvas.height);
     this.specializedDraw();
     this.ctx.restore();
   }
@@ -174,17 +176,32 @@ class GolCanvas extends Canvas {
   constructor(site, jCanvas) {
     super(jCanvas);
     this.site = site;
+    this.enableScreenSpaceOnlyDraw = true
   }
 
   drawGrid(n, m) {
     let ctx = this.ctx;
-    let w = ctx.canvas.width;
-    let h = ctx.canvas.height;
+    let w = this.site.state.width * n;
+    let h = this.site.state.height * m;
     ctx.beginPath();
     ctx.strokeStyle = 'grey';
+    let firstI = 0, firstJ = 0;
+    let lastJ = (this.site.state.height + 1) * m;
+    let lastI = (this.site.state.width + 1) * n;
+
+    if (this.enableScreenSpaceOnlyDraw) {
+      firstI = Math.floor(this.canvasStart.x / n) * n;
+      firstJ = Math.floor(this.canvasStart.y / m) * m;
+      lastI = Math.ceil(this.canvasEnd.x / n) * n;
+      lastJ = Math.ceil(this.canvasEnd.y / m) * m;
+      firstI = Math.max(firstI, 0);
+      firstJ = Math.max(firstJ, 0);
+      lastI = Math.min(lastI, w + n);
+      lastJ = Math.min(lastJ, w + m);
+    }
 
     //horizontal line
-    for (let i = 0; i < ctx.canvas.height; i += n) {
+    for (let i = firstJ; i < lastJ; i += n) {
       //https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
       ctx.moveTo(0 + 0.5, i + 0.5);
       ctx.lineTo(w + 0.5, i + 0.5);
@@ -192,7 +209,7 @@ class GolCanvas extends Canvas {
     }
 
     //vertical
-    for (let i = 0; i < ctx.canvas.width; i += m) {
+    for (let i = firstI; i < lastI; i += m) {
       ctx.moveTo(i + 0.5, 0 + 0.5);
       ctx.lineTo(i + 0.5, h + 0.5);
       ctx.stroke();
@@ -201,28 +218,25 @@ class GolCanvas extends Canvas {
 
   drawState() {
     let ctx = this.ctx;
-    let w = ctx.canvas.width;
-    let h = ctx.canvas.height;
     let state = this.site.state;
-    //site.ctx.fillRect(1, 1, 8, 8)
     let lastState = -1;
 
-    for (let i = 0; i < state.width; ++i) {
-      let viewSpace = null;
-      for (let j = 0; j < state.height; ++j) {
+    let firstElementI = 0, firstElementJ = 0;
+    let lastElementI = state.width;
+    let lastElementJ = state.height;
+    //figure out what cell elements are in view and draw thos only
+    if (this.enableScreenSpaceOnlyDraw) {
+      firstElementI = Math.max(Math.floor(this.canvasStart.x / 10), 0);
+      firstElementJ = Math.max(Math.floor(this.canvasStart.y / 10), 0);
+
+      lastElementI = Math.min(Math.ceil(this.canvasEnd.x / 10), state.width);
+      lastElementJ = Math.min(Math.ceil(this.canvasEnd.y / 10), state.height);
+    }
+
+    for (let i = firstElementI; i < lastElementI; ++i) {
+      for (let j = firstElementJ; j < lastElementJ; ++j) {
         let xStart = 10 * i + 1;
         let yStart = 10 * j + 1;
-
-        //todo: better yet compute which i, and j start and end that are in view
-        viewSpace = this.viewSpaceSector(xStart, yStart);
-        if (viewSpace.x === -1)
-          break;
-        if (viewSpace.x === 1)
-          break;
-        if (viewSpace.y === 1)
-          break; 
-        if (viewSpace.y === -1)
-          continue;
 
         let s = state.get(i, j);
         if (s !== lastState)
@@ -231,12 +245,6 @@ class GolCanvas extends Canvas {
         
         ctx.fillRect(xStart, yStart, 8, 8);
       }
-      if (viewSpace.y === 1) {
-        if (viewSpace.x === 1)
-          break;
-        continue;
-      }
-
     }
 
   }
