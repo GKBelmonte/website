@@ -7,6 +7,7 @@ var site = site || {};
  * Implement virual view of neighbours
  * Implement multi-state
  * Implement cavas drag-around
+ * Implement canvas zoom-inout
  * Implement init state
  * Implement wrap around
  */
@@ -97,6 +98,14 @@ class Canvas {
     return { x: resX, y: resY };
   }
 
+  canvasToHtml(x, y) {
+    let resX = x * this.scale;
+    let resY = y * this.scale;
+    resX = x + this.translatePos.x;
+    resY = y + this.translatePos.y;
+    return { x: resX, y: resY };
+  }
+
   findPos() {
     let obj = this.canvas;
     let curleft = 0, curtop = 0;
@@ -135,6 +144,28 @@ class Canvas {
       let newE = this.getMouseEvtData(origEvt);
       func(newE);
     }
+  }
+
+  viewSpaceSector(x, y) {
+    let hCoord = this.canvasToHtml(x, y);
+
+    let space = { x: 0, y: 0 };
+
+    if (hCoord.y < 0) {
+      space.y = -1;
+    }
+    else if (hCoord.y > this.canvas.height) {
+      space.y = 1;
+    }
+
+    if (hCoord.x < 0) {
+      space.x = -1;
+    }
+    else if (hCoord.x > this.canvas.width) {
+      space.x = 1;
+    }
+
+    return space;
   }
 }
 
@@ -175,16 +206,37 @@ class GolCanvas extends Canvas {
     let state = this.site.state;
     //site.ctx.fillRect(1, 1, 8, 8)
     let lastState = -1;
+
     for (let i = 0; i < state.width; ++i) {
+      let viewSpace = null;
       for (let j = 0; j < state.height; ++j) {
+        let xStart = 10 * i + 1;
+        let yStart = 10 * j + 1;
+
+        //todo: better yet compute which i, and j start and end that are in view
+        viewSpace = this.viewSpaceSector(xStart, yStart);
+        if (viewSpace.x === -1)
+          break;
+        if (viewSpace.x === 1)
+          break;
+        if (viewSpace.y === 1)
+          break; 
+        if (viewSpace.y === -1)
+          continue;
+
         let s = state.get(i, j);
         if (s !== lastState)
           this.setStateColor(ctx, s);
         lastState = s;
-        let xStart = 10 * i + 1;
-        let yStart = 10 * j + 1;
+        
         ctx.fillRect(xStart, yStart, 8, 8);
       }
+      if (viewSpace.y === 1) {
+        if (viewSpace.x === 1)
+          break;
+        continue;
+      }
+
     }
 
   }
@@ -239,8 +291,8 @@ function Initialize(param) {
   site.ctx = site.canvas.getContext('2d');
   site.golCanvas = new GolCanvas(site, site.jCanvas);
 
-  site.width = 100;
-  site.height = 50;
+  site.width = 150;
+  site.height = 150;
   site.N = 2;
 
   let state = createEmptyState();
