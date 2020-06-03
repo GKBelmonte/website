@@ -121,9 +121,10 @@ function Initialize(param) {
   site.play = false;
   
   let pulsarSeedMatrix = new Matrix(pulsarSeed);
+  let acornMatrix = new Matrix(acorn)
 
-  site.state.applyMatrixPattern(48, 18, pulsarSeedMatrix);
-  //applyMatrixPattern(site.state, 48, 18, pulsarSeedMatrix)
+  site.state.applyMatrixPattern(5, 5, pulsarSeedMatrix);
+  site.state.applyMatrixPattern(50, 30, acornMatrix);
   drawGrid(10, 10);
   draw();
 }
@@ -332,6 +333,12 @@ var pulsarSeed = [
   [0, 0, 0, 1, 0, 0, 0],
   [0, 0, 0, 1, 0, 0, 0],
   [0, 0, 0, 1, 0, 0, 0],
+];
+
+var acorn = [
+  [0, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0],
+  [1, 1, 0, 0, 1, 1, 1]
 ];
 
 $(document).ready(() => Initialize(0));
