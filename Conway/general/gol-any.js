@@ -1,5 +1,91 @@
 var site = site || {};
 
+/**
+ * TODO:
+ * Implement virual view of neighbours
+ * Implement multi-state
+ * Implement cavas drag-around
+ * Implement init state
+ * Implement wrap around
+ * Do we use 1-dim array with w*y + x ?
+ */
+
+class Matrix {
+  constructor(w, h) {
+    if (Array.isArray(arguments[0]))
+      this._arrayInit(w, h);
+    else if (arguments.length == 2)
+      this._widthHeightInit(w, h);
+    else if (arguments.length === 1)
+      this._widthHeightInit(w, w);
+    else
+      throw new Error('Bad args to Matrix ctor');
+    
+  }
+
+  _widthHeightInit(w, h) {
+    this._internal = new Array(w * h);
+    this.width = w;
+    this.height = h;
+    for (let i = 0; i < w; ++i) {
+      for (let j = 0; j < h; ++j) {
+        this._internal[i + j * w] = 0;
+      }
+    }
+  }
+
+  _arrayInit(arr, rowColumn) {
+    rowColumn = typeof (rowColumn) === 'undefined' ? true : false;
+
+    let numberOfRows = arr.length;
+    let numberOfColumns = arr[0].length;
+
+    this._internal = new Array(numberOfRows * numberOfColumns);
+    if (rowColumn) {
+      this.width = numberOfColumns;
+      this.height = numberOfRows;
+
+      for (let ay = 0; ay < numberOfRows; ++ay) {
+        for (let ax = 0; ax < numberOfColumns; ++ax) {
+          this.set(ax, ay, arr[ay][ax]);
+        }
+      }
+    } else {
+      let t = numberOfRows;
+      numberOfRows = numberOfColumns;
+      numberOfColumns = t;
+      this.width = numberOfColumns;
+      this.height = numberOfRows;
+
+      for (let ax = 0; ax < numberOfColumns; ++ax) {
+        for (let ay = 0; ay < numberOfRows; ++ay) {
+          this.set(ax, ay, arr[ax][ay]);
+        }
+      }
+    }
+  }
+
+  get(x, y) {
+    return this._internal[x + y * this.width];
+  }
+
+  set(x, y, val) {
+    this._internal[x + y * this.width] = val;
+  }
+
+  toString(pad) {
+    pad = pad || 3;
+    let res = [];
+    for (let x = 0; x < this.width; ++x) {
+      for (let y = 0; y < this.height; ++y) {
+        res.push(this.get(x, y).toString().padStart(3) + ",")
+      }
+      res.push('\n');
+    }
+    return res.join('');
+  }
+}
+
 function Initialize(param) {
   //refs:
   // 
@@ -20,22 +106,25 @@ function Initialize(param) {
 
   site.state = state;
   site.play = false;
+  debugger;
+  let pulsarSeedMatrix = new Matrix(pulsarSeed);
 
+  applyMatrixPattern(site.state, 48, 18, pulsarSeedMatrix)
+  drawGrid(10, 10);
   draw();
 }
 
 function draw(scale, offset) {
-  drawGrid(10, 10);
   drawState(site.state);
 }
 
 function createEmptyState() {
   let state = [];
   for (let i = 0; i < site.width; ++i) {
-    let row = [];
-    state.push(row);
+    let col = [];
+    state.push(col);
     for (let j = 0; j < site.height; ++j) {
-      row.push(0);
+      col.push(0);
     }
   }
 
@@ -45,11 +134,11 @@ function createEmptyState() {
 function playStop() {
   if (site.play) {
     site.play = false;
-    $('#play-button').addClass('play-stop-button-playing');
+    $('#play-button').removeClass('play-stop-button-playing');
   } else {
     site.play = true;
     setTimeout(frame, 500);
-    $('#play-button').removeClass('play-stop-button-playing');
+    $('#play-button').addClass('play-stop-button-playing');
   }
 }
 
@@ -127,7 +216,7 @@ function canvasMouseMove(e) {
   let pos = findPos(this);
   let x = e.pageX - pos.x;
   let y = e.pageY - pos.y;
-  let coord = "x=" + x + ", y=" + y;
+  let coord = "x=" + Math.floor(x / 10) + ", y=" + Math.floor(y/10);
   let coordBy4 = "x=" + x / 4 + ", y=" + y / 4;
   let c = this.getContext('2d');
   let p = c.getImageData(x, y, 1, 1).data;
@@ -194,6 +283,42 @@ function cycleState(state, x, y) {
   draw();
 }
 
+function applyPattern(state, x, y, pattern) {
+  //assume pattern is row-column
+  let numberOfRows = pattern.length;
+  if (numberOfRows === 0)
+    return;
+  let numberOfColumns = pattern[0].length;
+
+  if (x >= state[0].length)
+    return;
+  if (y >= state.length)
+    return;
+
+  for (let py = 0; py < numberOfRows; ++py) {
+    if (y + py >= state[0].length)
+      break;
+    for (let px = 0; px < numberOfColumns; ++px) {
+      if (x + px >= state.length)
+        break;
+      state[x + px][y + py] = pattern[py][px];
+    }
+  }
+}
+
+function applyMatrixPattern(state, x, y, pattern) {
+
+  for (let px = 0; px < pattern.width; ++px) {
+    if (px + x > state.length)
+      break;
+    for (let py = 0; py < pattern.height; ++py) {
+      if (py + y > state[0].length)
+        break;
+      state[px + x][py + y] = pattern.get(px, py);
+    }
+  }
+}
+
 function test(n) {
   let ctx = site.ctx;
   switch (n) {
@@ -216,5 +341,18 @@ function test(n) {
       break;
   }
 }
+
+//row-column order
+var pulsarSeed = [
+  [0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 0, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0],
+];
 
 $(document).ready(() => Initialize(0));
