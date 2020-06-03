@@ -5,10 +5,8 @@ var site = site || {};
 
 /**
  * TODO:
- * Implement virtual view of neighbours
  * Implement multi-state
  * Implement canvas zoom-inout
- * Implement wrap around
  */
 
 
@@ -25,6 +23,8 @@ function Initialize(param) {
   site.width = 150;
   site.height = 150;
   site.N = 2;
+  site.R = 1;
+  site.wrapAround = true;
 
   let state = createEmptyState();
 
@@ -72,17 +72,17 @@ function computeNextState(state) {
 
 function computeCellNextState(state, x, y) {
   let livingCount = 0;
-  for (let i = -1; i <= 1; ++i) {
-    let nx = x + i;
-    if (nx >= state.width)
-      break;
-    for (let j = -1; j <= 1; ++j) {
-      let ny = y + j;
-      if (ny >= state.height)
+  let xStart = x - site.R;
+  let yStart = y - site.R;
+  let diameter = site.R * 2 + 1;
+  for (let i = 0; i < diameter; ++i) {
+    let val = null;
+    for (let j = 0; j < diameter; ++j) {
+      val = site.state.getAsSubMatrix(xStart, yStart, i, j, site.wrapAround);
+      if (val === null)
         break;
-      let s = state.get(nx,ny);
-      if (s === 1)
-        livingCount += 1; 
+      if (val === 1)
+        livingCount += 1;
     }
   }
 

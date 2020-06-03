@@ -84,4 +84,40 @@ export class Matrix {
       }
     }
   }
+
+  getAsSubMatrix(rootX, rootY, x, y, wrapAround) {
+
+    wrapAround = typeof (wrapAround) !== 'undefined' ? wrapAround : false;
+    let finalX = rootX + x;
+    let finalY = rootY + y;
+
+    if (finalX >= this.width) {
+      if (wrapAround)
+        finalX -= this.width;
+      else
+        return null;
+    }
+
+    if (finalY >= this.height) {
+      if (wrapAround)
+        finalY -= this.height;
+      else
+        return null;
+    }
+
+    if (finalX < 0) {
+      if (wrapAround)
+        finalX += this.width;
+      else
+        return null;
+    }
+    if (finalY < 0) {
+      if (wrapAround)
+        finalY += this.height;
+      else
+        return null;
+    }
+
+    return this.get(finalX, finalY);
+  }
 }
