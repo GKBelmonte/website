@@ -7,7 +7,6 @@ var site = site || {};
  * Implement cavas drag-around
  * Implement init state
  * Implement wrap around
- * Do we use 1-dim array with w*y + x ?
  */
 
 class Matrix {
@@ -84,6 +83,18 @@ class Matrix {
     }
     return res.join('');
   }
+
+  applyMatrixPattern(x, y, pattern) {
+    for (let px = 0; px < pattern.width; ++px) {
+      if (px + x > this.width)
+        break;
+      for (let py = 0; py < pattern.height; ++py) {
+        if (py + y > this.height)
+          break;
+        this.set(px + x, py + y, pattern.get(px, py));
+      }
+    }
+  }
 }
 
 function Initialize(param) {
@@ -104,12 +115,15 @@ function Initialize(param) {
   $('#play-button').click(playStop);
   site.jCanvas.click(changeState)
 
+  debugger;
+
   site.state = state;
   site.play = false;
-  debugger;
+  
   let pulsarSeedMatrix = new Matrix(pulsarSeed);
 
-  applyMatrixPattern(site.state, 48, 18, pulsarSeedMatrix)
+  site.state.applyMatrixPattern(48, 18, pulsarSeedMatrix);
+  //applyMatrixPattern(site.state, 48, 18, pulsarSeedMatrix)
   drawGrid(10, 10);
   draw();
 }
@@ -119,16 +133,18 @@ function draw(scale, offset) {
 }
 
 function createEmptyState() {
-  let state = [];
-  for (let i = 0; i < site.width; ++i) {
-    let col = [];
-    state.push(col);
-    for (let j = 0; j < site.height; ++j) {
-      col.push(0);
-    }
-  }
 
-  return state;
+  return new Matrix(site.width, site.height);
+  //let state = [];
+  //for (let i = 0; i < site.width; ++i) {
+  //  let col = [];
+  //  state.push(col);
+  //  for (let j = 0; j < site.height; ++j) {
+  //    col.push(0);
+  //  }
+  //}
+
+  //return state;
 }
 
 function playStop() {
@@ -146,7 +162,7 @@ function computeNextState(state) {
   let newState = createEmptyState();
   for (let i = 0; i < site.width; ++i) {
     for (let j = 0; j < site.height; ++j) {
-      newState[i][j] = computeCellNextState(state, i, j);
+      newState.set(i, j, computeCellNextState(state, i, j) );
     }
   }
   return newState;
@@ -155,21 +171,20 @@ function computeNextState(state) {
 function computeCellNextState(state, x, y) {
   let livingCount = 0;
   for (let i = -1; i <= 1; ++i) {
+    let nx = x + i;
+    if (nx >= state.width)
+      break;
     for (let j = -1; j <= 1; ++j) {
-      let nx = x + i;
       let ny = y + j;
-      let r = state[nx];
-      if (typeof (r) !== 'undefined') {
-        let state = r[ny];
-        if (typeof (state) !== 'undefined' && state === 1)
-          livingCount += 1;
-      }
-      else {
+      if (ny >= state.height)
         break;
-      }
+      let s = state.get(nx,ny);
+      if (s === 1)
+        livingCount += 1; 
     }
   }
-  let isAlive = site.state[x][y];
+
+  let isAlive = state.get(x, y);
 
   if (!isAlive) {
     if (livingCount === 3)
@@ -254,7 +269,7 @@ function drawState(n, m) {
   let lastState = -1;
   for (let i = 0; i < site.width; ++i) {
     for (let j = 0; j < site.height; ++j) {
-      let state = site.state[i][j];
+      let state = site.state.get(i,j);
       if (state !== lastState)
         setStateColor(ctx, state);
       lastState = state;
@@ -278,45 +293,9 @@ function setStateColor(ctx, state) {
 }
 
 function cycleState(state, x, y) {
-  let s = state[x][y];
-  state[x][y] = (s + 1) % site.N;
+  let s = state.get(x, y);
+  state.set(x, y, (s + 1) % site.N);
   draw();
-}
-
-function applyPattern(state, x, y, pattern) {
-  //assume pattern is row-column
-  let numberOfRows = pattern.length;
-  if (numberOfRows === 0)
-    return;
-  let numberOfColumns = pattern[0].length;
-
-  if (x >= state[0].length)
-    return;
-  if (y >= state.length)
-    return;
-
-  for (let py = 0; py < numberOfRows; ++py) {
-    if (y + py >= state[0].length)
-      break;
-    for (let px = 0; px < numberOfColumns; ++px) {
-      if (x + px >= state.length)
-        break;
-      state[x + px][y + py] = pattern[py][px];
-    }
-  }
-}
-
-function applyMatrixPattern(state, x, y, pattern) {
-
-  for (let px = 0; px < pattern.width; ++px) {
-    if (px + x > state.length)
-      break;
-    for (let py = 0; py < pattern.height; ++py) {
-      if (py + y > state[0].length)
-        break;
-      state[px + x][py + y] = pattern.get(px, py);
-    }
-  }
 }
 
 function test(n) {
