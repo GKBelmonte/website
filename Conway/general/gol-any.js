@@ -1,3 +1,5 @@
+import { Matrix } from './matrix.js';
+
 var site = site || {};
 
 /**
@@ -9,91 +11,221 @@ var site = site || {};
  * Implement wrap around
  */
 
-class Matrix {
-  constructor(w, h) {
-    if (Array.isArray(arguments[0]))
-      this._arrayInit(w, h);
-    else if (arguments.length == 2)
-      this._widthHeightInit(w, h);
-    else if (arguments.length === 1)
-      this._widthHeightInit(w, w);
-    else
-      throw new Error('Bad args to Matrix ctor');
+class Canvas {
+  constructor(canvasJElement) {
+    this._jCanvas = canvasJElement;
+    this.canvas = canvasJElement[0];
+    let canvas = this.canvas;
+    this.ctx = this.canvas.getContext('2d')
+
+    let self = this;
+    canvas.addEventListener("mousedown",  e => self.onMouseDown(e, this));
+    canvas.addEventListener("mouseup",    e => self.onMouseUp(e, this));
+    canvas.addEventListener("mouseover",  e => self.onMouseOver(e, this));
+    canvas.addEventListener("mouseout",   e => self.onMouseOut(e, this));
+    canvas.addEventListener("mousemove",  e => self.onMouseMove(e, this));
+    canvas.addEventListener('click',      e => self.onMouseClick(e, this));
+    canvas.addEventListener('contextmenu', event => event.preventDefault(), false);
     
+    this.translatePos = {
+      x: 0,
+      y: 0
+    };
+    this.startDragOffset = {};
+    this.isMouseDown = false;
+    this.scale = 1;
+
+    this.mouseMove = null;
+    this.mouseClick = null;
   }
 
-  _widthHeightInit(w, h) {
-    this._internal = new Array(w * h);
-    this.width = w;
-    this.height = h;
-    for (let i = 0; i < w; ++i) {
-      for (let j = 0; j < h; ++j) {
-        this._internal[i + j * w] = 0;
-      }
+  onMouseClick(evt, orig) {
+    this.raiseMouseEvent('mouseClick', evt);
+  }
+
+  onMouseDown(evt) {
+    if (evt.which !== 3)
+      return;
+    this.isMouseDown = true;
+    this.startDragOffset.x = evt.clientX - this.translatePos.x;
+    this.startDragOffset.y = evt.clientY - this.translatePos.y;
+  }
+
+  onMouseUp(evt) {
+    this.isMouseDown = false;
+  }
+
+  onMouseOut(evt) {
+    this.isMouseDown = false;
+  }
+
+  onMouseOver(evt) {
+    this.isMouseDown = false;
+  }
+
+  onMouseMove(evt, orig) {
+    if (this.isMouseDown) {
+      this.translatePos.x = evt.clientX - this.startDragOffset.x;
+      this.translatePos.y = evt.clientY - this.startDragOffset.y;
+      this.draw();
+    }
+    this.raiseMouseEvent('mouseMove', evt);
+  }
+
+  draw(e) {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.save();
+    this.ctx.translate(this.translatePos.x, this.translatePos.y);
+    this.ctx.scale(this.scale, this.scale);
+    this.specializedDraw();
+    this.ctx.restore();
+  }
+
+  specializedDraw() {
+    //implemented by child class
+  }
+
+  get hCanvas() { return this.canvas }
+
+  get jCanvas() { return this._jCanvas }
+
+  htmlToCanvas(x, y) {
+    let resX = x / this.scale;
+    let resY = y / this.scale;
+    resX = x - this.translatePos.x;
+    resY = y - this.translatePos.y;
+    return { x: resX, y: resY };
+  }
+
+  findPos() {
+    let obj = this.canvas;
+    let curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+      do {
+        curleft += obj.offsetLeft;
+        curtop += obj.offsetTop;
+      } while (obj = obj.offsetParent);
+      return { x: curleft, y: curtop };
+    }
+    return undefined;
+  }
+
+  getMouseRelativeHtmlPos(e) {
+    let pos = this.findPos();
+    let xPix = e.pageX - pos.x;
+    let yPix = e.pageY - pos.y;
+    return { x: xPix, y:yPix };
+  }
+
+  getMouseEvtData(e) {
+    let htmlPos = this.getMouseRelativeHtmlPos(e);
+    let canvasPos = this.htmlToCanvas(htmlPos.x, htmlPos.y);
+    let evt = {
+      sender: this,
+      originalEvent: e,
+      htmlPos: htmlPos,
+      canvasPos: canvasPos
+    };
+    return evt;
+  }
+
+  raiseMouseEvent(name, origEvt) {
+    let func = this[name];
+    if (!!func) {
+      let newE = this.getMouseEvtData(origEvt);
+      func(newE);
+    }
+  }
+}
+
+class GolCanvas extends Canvas {
+
+  constructor(site, jCanvas) {
+    super(jCanvas);
+    this.site = site;
+  }
+
+  drawGrid(n, m) {
+    let ctx = this.ctx;
+    let w = ctx.canvas.width;
+    let h = ctx.canvas.height;
+    ctx.beginPath();
+    ctx.strokeStyle = 'grey';
+
+    //horizontal line
+    for (let i = 0; i < ctx.canvas.height; i += n) {
+      //https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+      ctx.moveTo(0 + 0.5, i + 0.5);
+      ctx.lineTo(w + 0.5, i + 0.5);
+      ctx.stroke();
+    }
+
+    //vertical
+    for (let i = 0; i < ctx.canvas.width; i += m) {
+      ctx.moveTo(i + 0.5, 0 + 0.5);
+      ctx.lineTo(i + 0.5, h + 0.5);
+      ctx.stroke();
     }
   }
 
-  _arrayInit(arr, rowColumn) {
-    rowColumn = typeof (rowColumn) === 'undefined' ? true : false;
-
-    let numberOfRows = arr.length;
-    let numberOfColumns = arr[0].length;
-
-    this._internal = new Array(numberOfRows * numberOfColumns);
-    if (rowColumn) {
-      this.width = numberOfColumns;
-      this.height = numberOfRows;
-
-      for (let ay = 0; ay < numberOfRows; ++ay) {
-        for (let ax = 0; ax < numberOfColumns; ++ax) {
-          this.set(ax, ay, arr[ay][ax]);
-        }
-      }
-    } else {
-      let t = numberOfRows;
-      numberOfRows = numberOfColumns;
-      numberOfColumns = t;
-      this.width = numberOfColumns;
-      this.height = numberOfRows;
-
-      for (let ax = 0; ax < numberOfColumns; ++ax) {
-        for (let ay = 0; ay < numberOfRows; ++ay) {
-          this.set(ax, ay, arr[ax][ay]);
-        }
+  drawState() {
+    let ctx = this.ctx;
+    let w = ctx.canvas.width;
+    let h = ctx.canvas.height;
+    let state = this.site.state;
+    //site.ctx.fillRect(1, 1, 8, 8)
+    let lastState = -1;
+    for (let i = 0; i < state.width; ++i) {
+      for (let j = 0; j < state.height; ++j) {
+        let s = state.get(i, j);
+        if (s !== lastState)
+          this.setStateColor(ctx, s);
+        lastState = s;
+        let xStart = 10 * i + 1;
+        let yStart = 10 * j + 1;
+        ctx.fillRect(xStart, yStart, 8, 8);
       }
     }
+
   }
 
-  get(x, y) {
-    return this._internal[x + y * this.width];
-  }
-
-  set(x, y, val) {
-    this._internal[x + y * this.width] = val;
-  }
-
-  toString(pad) {
-    pad = pad || 3;
-    let res = [];
-    for (let x = 0; x < this.width; ++x) {
-      for (let y = 0; y < this.height; ++y) {
-        res.push(this.get(x, y).toString().padStart(3) + ",")
-      }
-      res.push('\n');
-    }
-    return res.join('');
-  }
-
-  applyMatrixPattern(x, y, pattern) {
-    for (let px = 0; px < pattern.width; ++px) {
-      if (px + x > this.width)
+  setStateColor(ctx, state) {
+    switch (state) {
+      case 0:
+        ctx.fillStyle = 'black';
         break;
-      for (let py = 0; py < pattern.height; ++py) {
-        if (py + y > this.height)
-          break;
-        this.set(px + x, py + y, pattern.get(px, py));
-      }
+      case 1:
+        ctx.fillStyle = 'white';
+        break;
     }
+  }
+
+  specializedDraw() {
+    this.drawGrid(10, 10);
+    this.drawState(this.state);
+    //this.testDraw();
+  }
+
+  testDraw() {
+    let context = this.ctx;
+    context.beginPath(); // begin custom shape
+    context.moveTo(-119, -20);
+    context.bezierCurveTo(-159, 0, -159, 50, -59, 50);
+    context.bezierCurveTo(-39, 80, 31, 80, 51, 50);
+    context.bezierCurveTo(131, 50, 131, 20, 101, 0);
+    context.bezierCurveTo(141, -60, 81, -70, 51, -50);
+    context.bezierCurveTo(31, -95, -39, -80, -39, -50);
+    context.bezierCurveTo(-89, -95, -139, -80, -119, -20);
+    context.closePath(); // complete custom shape
+    let grd = context.createLinearGradient(-59, -100, 81, 100);
+    grd.addColorStop(0, "#8ED6FF"); // light blue
+    grd.addColorStop(1, "#004CB3"); // dark blue
+    context.fillStyle = grd;
+    context.fill();
+
+    context.lineWidth = 5;
+    context.strokeStyle = "#0000ff";
+    context.stroke();
   }
 }
 
@@ -105,15 +237,20 @@ function Initialize(param) {
   site.jCanvas = $('canvas');
   site.canvas = site.jCanvas[0];
   site.ctx = site.canvas.getContext('2d');
-  site.jCanvas.mousemove(canvasMouseMove);
+  site.golCanvas = new GolCanvas(site, site.jCanvas);
+
   site.width = 100;
   site.height = 50;
   site.N = 2;
 
   let state = createEmptyState();
 
+  site.golCanvas.mouseClick = changeState;
+  site.golCanvas.mouseMove = canvasMouseMove;
+
+
   $('#play-button').click(playStop);
-  site.jCanvas.click(changeState)
+  
 
   debugger;
 
@@ -125,27 +262,12 @@ function Initialize(param) {
 
   site.state.applyMatrixPattern(5, 5, pulsarSeedMatrix);
   site.state.applyMatrixPattern(50, 30, acornMatrix);
-  drawGrid(10, 10);
-  draw();
-}
-
-function draw(scale, offset) {
-  drawState(site.state);
+  
+  site.golCanvas.draw();
 }
 
 function createEmptyState() {
-
   return new Matrix(site.width, site.height);
-  //let state = [];
-  //for (let i = 0; i < site.width; ++i) {
-  //  let col = [];
-  //  state.push(col);
-  //  for (let j = 0; j < site.height; ++j) {
-  //    col.push(0);
-  //  }
-  //}
-
-  //return state;
 }
 
 function playStop() {
@@ -202,7 +324,7 @@ function computeCellNextState(state, x, y) {
 
 function frame() {
   site.state = computeNextState(site.state);
-  draw();
+  site.golCanvas.draw();
   if (site.play)
     setTimeout(frame, 500);
 }
@@ -219,84 +341,32 @@ function findPos(obj) {
   return undefined;
 }
 
-function changeState(e) {
+//for ref
+function clickPos(e) {
   let pos = findPos(this);
   let xPix = e.pageX - pos.x;
   let yPix = e.pageY - pos.y;
-  let x = Math.floor(xPix / 10);
-  let y = Math.floor(yPix / 10);
+}
+
+function changeState(e) {
+  let rp = e.canvasPos;
+  let x = Math.floor(rp.x / 10);
+  let y = Math.floor(rp.y / 10);
   cycleState(site.state, x, y);
 }
 
 function canvasMouseMove(e) {
-  let pos = findPos(this);
-  let x = e.pageX - pos.x;
-  let y = e.pageY - pos.y;
-  let coord = "x=" + Math.floor(x / 10) + ", y=" + Math.floor(y/10);
-  let coordBy4 = "x=" + x / 4 + ", y=" + y / 4;
-  let c = this.getContext('2d');
-  let p = c.getImageData(x, y, 1, 1).data;
-  let val = '?';//root[Math.floor(x/4)][Math.floor(y/4)];
+  let rp = e.canvasPos;
+  let x = Math.floor(rp.x / 10);
+  let y = Math.floor(rp.y / 10);
+  let coord = "x=" + x + ", y=" + y;
   $('#loc').html(coord);
-}
-
-function drawGrid(n,m) {
-  let ctx = site.ctx;
-  let w = ctx.canvas.width;
-  let h = ctx.canvas.height;
-  ctx.beginPath();
-  ctx.strokeStyle = 'grey';
-
-  //horizontal line
-  for (let i = 0; i < ctx.canvas.height; i += n) {
-    //https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-    ctx.moveTo(0+0.5, i+0.5);
-    ctx.lineTo(w+0.5, i+0.5);
-    ctx.stroke();
-  }
-
-  for (let i = 0; i < ctx.canvas.width; i += m) {
-    ctx.moveTo(i + 0.5, 0 + 0.5);
-    ctx.lineTo(i + 0.5, h + 0.5);
-    ctx.stroke();
-  }
-}
-
-function drawState(n, m) {
-  let ctx = site.ctx;
-  let w = ctx.canvas.width;
-  let h = ctx.canvas.height;
-  //site.ctx.fillRect(1, 1, 8, 8)
-  let lastState = -1;
-  for (let i = 0; i < site.width; ++i) {
-    for (let j = 0; j < site.height; ++j) {
-      let state = site.state.get(i,j);
-      if (state !== lastState)
-        setStateColor(ctx, state);
-      lastState = state;
-      let xStart = 10 * i + 1;
-      let yStart = 10 * j + 1;
-      ctx.fillRect(xStart, yStart, 8, 8); 
-    }
-  }
-
-}
-
-function setStateColor(ctx, state) {
-  switch (state) {
-    case 0:
-      ctx.fillStyle = 'black';
-      break;
-    case 1:
-      ctx.fillStyle = 'white';
-      break;
-  }
 }
 
 function cycleState(state, x, y) {
   let s = state.get(x, y);
   state.set(x, y, (s + 1) % site.N);
-  draw();
+  site.golCanvas.draw();
 }
 
 function test(n) {
