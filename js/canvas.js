@@ -13,6 +13,7 @@ export class Canvas {
     canvas.addEventListener("mousemove", e => self.onMouseMove(e, this));
     canvas.addEventListener('click', e => self.onMouseClick(e, this));
     canvas.addEventListener('contextmenu', event => event.preventDefault(), false);
+    canvas.addEventListener('wheel', e => self.onMouseWheel(e, this));
 
     this.translatePos = {
       x: 0,
@@ -24,6 +25,11 @@ export class Canvas {
 
     this.mouseMove = null;
     this.mouseClick = null;
+
+    this.manipButton = 2;
+    this.minScale = 0.25;
+    this.maxScale = 4;
+    this.wheelFactor = 0.1;
   }
 
   onMouseClick(evt, orig) {
@@ -31,7 +37,7 @@ export class Canvas {
   }
 
   onMouseDown(evt) {
-    if (evt.which !== 3)
+    if (evt.which !== this.manipButton)
       return;
     this.isMouseDown = true;
     this.startDragOffset.x = evt.clientX - this.translatePos.x;
@@ -59,6 +65,18 @@ export class Canvas {
     this.raiseMouseEvent('mouseMove', evt);
   }
 
+  onMouseWheel(evt, orig) {
+    let delta = evt.wheelDelta
+    if (delta > 0)
+      this.scale = this.scale * (1 + this.wheelFactor);
+    if (delta < 0)
+      this.scale = this.scale * (1 - this.wheelFactor);
+
+    this.scale = Math.max(Math.min(this.maxScale, this.scale), this.minScale);
+    this.draw();
+    
+  }
+
   draw(e) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
@@ -79,11 +97,11 @@ export class Canvas {
   get jCanvas() { return this._jCanvas }
 
   htmlToCanvas(x, y) {
-    let resX = x / this.scale;
-    let resY = y / this.scale;
-    resX = x - this.translatePos.x;
-    resY = y - this.translatePos.y;
-    return { x: resX, y: resY };
+    let resX = x ;
+    let resY = y ;
+    resX = resX - this.translatePos.x;
+    resY = resY - this.translatePos.y;
+    return { x: resX / this.scale, y: resY / this.scale};
   }
 
   canvasToHtml(x, y) {
