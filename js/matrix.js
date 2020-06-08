@@ -64,8 +64,8 @@ export class Matrix {
   toString(pad) {
     pad = pad || 3;
     let res = [];
-    for (let x = 0; x < this.width; ++x) {
-      for (let y = 0; y < this.height; ++y) {
+    for (let y = 0; y < this.height; ++y) {
+      for (let x = 0; x < this.width; ++x) {
         res.push(this.get(x, y).toString().padStart(3) + ",")
       }
       res.push('\n');
@@ -119,5 +119,54 @@ export class Matrix {
     }
 
     return this.get(finalX, finalY);
+  }
+
+  //Assume an integer can encode the values of a matrix based on the base b.
+  updateFromInt(val, base) {
+    //the last value is the least significant, if we
+    // want to be the same as wolfram's so big endian
+    // since its bigendian, we have to start from
+    // the end and work back
+    let digit = 0;
+    for (let y = this.height - 1; y >= 0; --y) {
+      for (let x = this.width - 1; x >= 0; --x) {
+        let power = Math.pow(base, digit);
+        let digitVal = Math.floor(val / power) % base; 
+        this.set(x, y, digitVal);
+        digit++;
+      }
+    }
+  }
+
+  getAsInt(base) {
+    let digits = this.width * this.height;
+    if (digits > 31 * Math.log(2) / Math.log(base))
+      throw new Error(`Cannot express this matrix in base ${base}`);
+    let res = 0;
+    let digit = 0;
+    for (let y = this.height - 1; y >= 0; --y) {
+      for (let x = this.width - 1; x >= 0; --x) {
+        let power = Math.pow(base, digit);
+        res += this.get(x,y) * power;
+        digit++;
+      }
+    }
+    return res;
+  }
+
+  getSubMatrixAsInt(rootX,rootY,width,height,base) {
+    let digits = width * height;
+    if (digits > 31 * Math.log(2) / Math.log(base))
+      throw new Error(`Cannot express this matrix in base ${base}`);
+    let res = 0;
+    let digit = 0;
+    for (let y = height - 1; y >= 0; --y) {
+      for (let x = width - 1; x >= 0; --x) {
+        let power = Math.pow(base, digit);
+        res += this.getAsSubMatrix(rootX, rootY, x, y, true) * power;
+        digit++;
+      }
+    }
+    return res;
   }
 }
