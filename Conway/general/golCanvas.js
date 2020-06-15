@@ -68,9 +68,12 @@ export class GolCanvas extends Canvas {
         let yStart = 10 * j + 1;
 
         let s = state.get(i, j);
-        if (s !== lastState)
+        if (s !== lastState && s !== 0)
           this.setStateColor(ctx, s);
         lastState = s;
+
+        if (s === 0)
+          continue;
 
         ctx.fillRect(xStart, yStart, 8, 8);
       }
@@ -86,6 +89,26 @@ export class GolCanvas extends Canvas {
       case 1:
         ctx.fillStyle = 'white';
         break;
+      case 2: //yellow
+        ctx.fillStyle = '#FFEE33'; 
+        break;
+      case 3: //green
+        ctx.fillStyle = '#1D6914';
+        break;
+      case 4: //cyan
+        ctx.fillStyle = '#29D0D0';
+        break;
+      case 5: // orange 
+        ctx.fillStyle = '#FF9233';
+        break;
+      case 6: // blue
+        ctx.fillStyle = '#2A4BD7';
+        break;
+      case 7: // red 
+        ctx.fillStyle = '#AD2323';
+        break;
+      default:
+        throw new Error("Undefined state");
     }
   }
 

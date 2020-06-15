@@ -1,17 +1,21 @@
 ﻿import { Matrix } from './../../js/matrix.js';
+import { Rand } from './../../js/rand.js';
 import { GolCanvas } from './golCanvas.js';
 
 var site = site || {};
 
 var debug = true;
-/**
- * TODO:
- * Implement multi-state
- */
 
+const mapType = 'map';
+const polyType = 'poly';
+const customType = 'custom';
 
 class GolRuleSet {
-  constructor(base, radius) {
+
+  constructor(base, radius, type) {
+    this._type = typeof (type) === 'undefined'
+      ? mapType
+      : type;
     this._base = base;
     this._radius = radius;
     //B: base (or number of possible states)
@@ -33,14 +37,25 @@ class GolRuleSet {
     let submatrixWidth = 2 * this._radius + 1;
     this._affectingElementCount = submatrixWidth * submatrixWidth;
     this._ruleCount = Math.pow(this._base, this._affectingElementCount);
-    if (this._ruleCount > 1000000)
-      throw new Error(`Total rule count is too large ${this._ruleCount}`);
-    this._rules = new Array(this._ruleCount);
+
+    if (this._type === mapType) {
+      if (this._ruleCount > 1000000)
+        throw new Error(`Total rule count is too large ${this._ruleCount}`);
+      this._rules = new Array(this._ruleCount);
+    }
+    else if (this._type === 'poly') {
+      this._numOfCoefficients = Math.max(this._affectingElementCount, this._base) + 2;
+      this._coeffs = new Array(this._numOfCoefficients);
+
+    }
   }
 
   get radius() { return this._radius; }
 
   get base() { return this._base; }
+
+  get customFunc() { return this._customFunc; }
+  set customFunc(val) { this._customFunc = val; }
 
   static getFromFunc(f, b, r) {
     let ruleset = new GolRuleSet(b, r);
@@ -55,7 +70,90 @@ class GolRuleSet {
   }
 
   apply(value) {
-    return this._rules[value];
+    if (this._type === mapType)
+      return this._rules[value];
+    else if (this._type === polyType)
+      return this.evaluatePolynomial(value);
+    else if (this._type === customType)
+      return this._customFunc(value);
+  }
+
+  evaluatePolynomial(value) {
+    let pows = this.getPowers(value, this._coeffs.length);
+    let res = 0;
+    for (let i = 0; i < pows.length; ++i) {
+      let nextVal = res + pows[i] * this._coeffs[i];
+      res = nextVal ;
+    }
+    return Math.floor(res) % this._base;
+  }
+
+  getPowers(val, degree) {
+    let pow = 1;
+    let res = new Array(degree);
+    for (let i = 0; i < degree; ++i) {
+      res[i] = pow % this._base;
+      pow = pow * val;
+    }
+    return res;
+  }
+
+  //a 1D rule would then be transformed to a
+  // 2D where the second dimension y is time.
+  static getFrom1DRuleSet(ruleId, b, r) {
+    //i = 2*r+1
+    let width = 2 * r + 1;
+    let ruleset = new GolRuleSet(b, r);
+    let m = new Matrix(width, width);
+    for (let i = 0; i < ruleset._ruleCount; ++i) {
+      //Update matrix to one that represents i
+      m.updateFromInt(i, b);
+      //top row as a digit
+      let topRow = m.getSubMatrixAsInt(0, 0, width, 1, b);
+      let oldState = m.get(r, r);
+      let nextState = Math.floor(ruleId / Math.pow(b, topRow) % b);
+      ruleset._rules[i] = topRow !== 0 ? nextState : oldState;
+    }
+    return ruleset;
+  }
+
+  static getFromRandom(b, r, sparse, seed) {
+
+    let rand = new Rand(seed);
+
+    //let frand = {
+    //  nextFloat : () => Math.random(),
+    //  next : () => Math.floor(Math.random() * 32768)
+    //}
+    //rand = frand;
+
+    let sparseType = typeof (sparse)
+    sparse = sparseType === 'undefined' ? false : sparse;
+    let sparseValue = 0.5;
+    if (sparseType === 'number')
+      sparseValue = sparse;
+
+    let ruleset = new GolRuleSet(b, r);
+    for (let i = 0; i < ruleset._ruleCount; ++i) {
+      if (!sparse || rand.nextFloat() > sparseValue)
+        ruleset._rules[i] = rand.next() % b;
+      else
+        ruleset._rules[i] = 0;
+    }
+    ruleset.seed = rand.initialSeed;
+    return ruleset;
+  }
+
+  static getFromRandomPoly(b, r, seed) {
+
+    let rand = new Rand(seed);
+
+    let ruleset = new GolRuleSet(b, r, polyType);
+    for (let i = 0; i < ruleset._coeffs.length; ++i) {
+      ruleset._coeffs[i] = rand.nextFloat() * b;
+    }
+    ruleset.seed = rand.initialSeed;
+    return ruleset;
   }
 }
 
@@ -71,7 +169,7 @@ function Initialize(param) {
 
   site.width = 100;
   site.height = 100;
-  site.N = 2;
+  site.N = 4;
   site.R = 1;
   site.wrapAround = true;
 
@@ -88,8 +186,8 @@ function Initialize(param) {
   let pulsarSeedMatrix = new Matrix(pulsarSeed);
   let acornMatrix = new Matrix(acorn)
 
-  site.state.applyMatrixPattern(5, 5, pulsarSeedMatrix);
-  site.state.applyMatrixPattern(50, 30, acornMatrix);
+  //site.state.applyMatrixPattern(5, 5, pulsarSeedMatrix);
+  //site.state.applyMatrixPattern(50, 30, acornMatrix);
   
   site.golCanvas.draw();
 
@@ -103,6 +201,64 @@ function Initialize(param) {
   let nextState = classicGol.apply(7);
   if (nextState !== 1 && debug)
     throw new Error("Should not happen");
+
+  let ruleset90 = GolRuleSet.getFrom1DRuleSet(90, 2, 1);
+  site.ruleset = ruleset90;
+  //nothing about this assumes time, yet it behaves as such...
+  //all it assumes is that if the top value is not 0, we should compute the next one.
+  // however, because the result would be the same nothing changes until another wave passes
+  // really cool
+  let ruleset96 = GolRuleSet.getFrom1DRuleSet(150, 2, 1); //xor
+  site.ruleset = ruleset96;
+  // this ruleset is turing complete.
+  let ruleset110 = GolRuleSet.getFrom1DRuleSet(110, 2, 1);
+  site.ruleset = ruleset110;
+
+
+  let interestingSeeds = [1316, 29223, 9459, 22713, 3074];
+  //random ruleset out of 2^512 (if n = 2)
+  //let randRuleSet = GolRuleSet.getFromRandom(site.N, 1, 0.77);
+  //site.ruleset = randRuleSet;
+
+
+  let interestingPolySeeds = [13149, 6986]
+  //random ruleset out of 2^512
+  //let polyRuleSet = GolRuleSet.getFromRandomPoly(site.N, 1);
+  //site.ruleset = polyRuleSet;
+
+  let customRule = new GolRuleSet(site.N, 1, customType);
+  customRule.customFunc = (val) => custom1(val);
+  site.ruleset = customRule;
+
+  let startingStateSeed = 2;
+  let density = 0.03;
+
+  initRandState(startingStateSeed, density);
+
+  site.golCanvas.draw();
+  $('#seed').html(site.ruleset.seed);
+}
+
+function initRandState(seed, density) {
+  let rand = new Rand(seed);
+  for (let i = 0; i < site.width; ++i) {
+    for (let j = 0; j < site.height; ++j) {
+      if (rand.nextFloat() < density)
+        site.state.set(i, j, rand.next() % site.N);
+    }
+  }
+}
+
+function custom1(val) {
+  //return Math.floor((val % 32)/ 16);
+  let res = 0;
+  res = Math.floor((val / 256) % 4);
+  if (res !== 0)
+    return res;
+
+  let pick = val % 9;
+  let digit = Math.floor(val / Math.pow(site.N, pick)) % 4
+  return digit;
 }
 
 function createEmptyState() {
@@ -125,7 +281,8 @@ function computeNextState(state) {
   for (let i = 0; i < site.width; ++i) {
     for (let j = 0; j < site.height; ++j) {
       //newState.set(i, j, computeCellNextState(state, i, j) );
-      newState.set(i, j, computeCellNextStateFromRuleSet(state, i, j, site.ruleset));
+      let nextIJstate = computeCellNextStateFromRuleSet(state, i, j, site.ruleset);
+      newState.set(i, j, nextIJstate);
     }
   }
   return newState;
@@ -213,7 +370,7 @@ function canvasMouseMove(e) {
   let rp = e.canvasPos;
   let x = Math.floor(rp.x / 10);
   let y = Math.floor(rp.y / 10);
-  let coord = "x=" + x + ", y=" + y;
+  let coord = `x=${x}, y=${y}`;
   $('#loc').html(coord);
 }
 
