@@ -75,3 +75,14 @@ button.btn-export {
   margin-left: 48%;
   margin-top: 1em;
 }
+
+.Nether-div span {
+  color: red;
+}
+
+.Overworld-div span {
+  color: #79f3f1;
+  bottom: 1.3em;
+  position: relative;
+  left: 1em;
+}
