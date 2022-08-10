@@ -69,3 +69,9 @@ span.portal-coord {
 .tooltipcontainer:hover + .tooltiptext {
   visibility: visible;
 }
+
+button.btn-export {
+  color: darkslategrey;
+  margin-left: 48%;
+  margin-top: 1em;
+}

@@ -132,23 +132,26 @@ class Portal {
 
 function Refresh()
 {
-    $(".portal-arrows").html("");
-    let overworldPortalsUi = $('.portal-holder-overworld .portal-entry');
-    let overworldPortals = [];
-    for(let i = 0; i < overworldPortalsUi.length - 1; ++i)
-    {
-        overworldPortals.push(new Portal($(overworldPortalsUi[i]), "Overworld"));
-    }
+  $(".portal-arrows").html("");
+  let { overworldPortals, netPortals } = GetPortals();
     
-    let netPortalsUi = $('.portal-holder-nether .portal-entry');
-    let netPortals = [];
-    for(let i = 0; i < netPortalsUi.length - 1; ++i)
-    {
-        netPortals.push(new Portal($(netPortalsUi[i]), "Nether"));
-    }
-    
-    FindLinks(overworldPortals, netPortals, "Overworld");
-    FindLinks(netPortals , overworldPortals, "Nether");
+  FindLinks(overworldPortals, netPortals, "Overworld");
+  FindLinks(netPortals , overworldPortals, "Nether");
+}
+
+function GetPortals() {
+  let overworldPortalsUi = $('.portal-holder-overworld .portal-entry');
+  let overworldPortals = [];
+  for (let i = 0; i < overworldPortalsUi.length - 1; ++i) {
+    overworldPortals.push(new Portal($(overworldPortalsUi[i]), "Overworld"));
+  }
+
+  let netPortalsUi = $('.portal-holder-nether .portal-entry');
+  let netPortals = [];
+  for (let i = 0; i < netPortalsUi.length - 1; ++i) {
+    netPortals.push(new Portal($(netPortalsUi[i]), "Nether"));
+  }
+  return { overworldPortals, netPortals };
 }
 
 function FindLinks(portalsLeft, portalsRight, dim)
@@ -224,6 +227,11 @@ function ExportPortals(overworldPortals, netPortals) {
   let fileName = "portals.json";
 
   SaveFile(fileName, contents);
+}
+
+function ExportPortalsUI() {
+  let { overworldPortals, netPortals } = GetPortals()
+  ExportPortals(overworldPortals, netPortals);
 }
 
 function SaveFile(fileName, fileContents) {

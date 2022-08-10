@@ -23,54 +23,53 @@
   <title></title>
 </head>
 <body>
-    <div id="all-content">
-        <div class="med-title med-section"><a name="title"></a>Nether Portal Linking</div>
-        
-        <div class="container-fluid med-section">
-            <div class="col-sm-6 med-col">
-                <h1><a name="overworld"></a>Overworld</h1>
-                <div class="med-section row portal-holder-overworld" >
-                    
-                    <div class="portal-entry portal-entry-add" class="center-horizontal">
-                        <span>x:</span><input type="number" />
-                        <span>z:</span><input type="number" />
-                        <span>y:</span><input type="number" />
-                        <button type="button" onclick="AddPortal(this, 'Overworld')">+</button>
-                    </div>
-                </div>
+  <div id="all-content">
+    <div class="med-title med-section"><a name="title"></a>Nether Portal Linking</div>
 
-                
-            </div>
-            <div class="portal-arrows"> 
-                <!-- <svg class="portal-arrow" width="306" height="100" style="top: 90.3907px; left: 415px;"> -->
+    <div class="container-fluid med-section">
+      <div class="col-sm-6 med-col">
+        <h1><a name="overworld"></a>Overworld</h1>
+        <div class="med-section row portal-holder-overworld">
 
-                    <!-- <defs> -->
-                        <!-- <marker id="arrow" markerWidth="13" markerHeight="13" refX="2" refY="6" orient="auto"> -->
-                            <!-- <path d="M2,2 L2,11 L10,6 L2,2"></path> -->
-                        <!-- </marker> -->
-                    <!-- </defs> -->
-
-                    <!-- <path d="M-50,0 L60,52"> -->
-                    <!-- </path> -->
-
-                <!-- </svg> -->
-            </div>
-
-            <div class="col-sm-6 med-col">
-                <h1><a name="nether"></a>Nether</h1>
-                <div class="med-section row portal-holder-nether" >
-                    
-                    <div class="portal-entry portal-entry-add" class="center-horizontal">
-                        <span>x:</span><input type="number" onclick=""/>
-                        <span>z:</span><input type="number" onclick=""/>
-                        <span>y:</span><input type="number" onclick=""/>
-                        <button type="button" onclick="AddPortal(this, 'Nether')">+</button>
-                    </div>
-                    
-                </div>
-            </div>
-            
+          <div class="portal-entry portal-entry-add" class="center-horizontal">
+            <span>x:</span><input type="number" />
+            <span>z:</span><input type="number" />
+            <span>y:</span><input type="number" />
+            <button type="button" onclick="AddPortal(this, 'Overworld')">+</button>
+          </div>
         </div>
+
+
+      </div>
+      <div class="portal-arrows">
+        <!-- <svg class="portal-arrow" width="306" height="100" style="top: 90.3907px; left: 415px;"> -->
+        <!-- <defs> -->
+        <!-- <marker id="arrow" markerWidth="13" markerHeight="13" refX="2" refY="6" orient="auto"> -->
+        <!-- <path d="M2,2 L2,11 L10,6 L2,2"></path> -->
+        <!-- </marker> -->
+        <!-- </defs> -->
+        <!-- <path d="M-50,0 L60,52"> -->
+        <!-- </path> -->
+        <!-- </svg> -->
+      </div>
+      <div class="col-sm-6 med-col">
+        <h1><a name="nether"></a>Nether</h1>
+        <div class="med-section row portal-holder-nether">
+
+          <div class="portal-entry portal-entry-add" class="center-horizontal">
+            <span>x:</span><input type="number" onclick="" />
+            <span>z:</span><input type="number" onclick="" />
+            <span>y:</span><input type="number" onclick="" />
+            <button type="button" onclick="AddPortal(this, 'Nether')">+</button>
+          </div>
+
+        </div>
+      </div>
     </div>
+    <div class="container-fluid med-section">
+      <button type="button" class="btn btn-export" onclick="ExportPortalsUI()">Export</button>
+    </div>
+
+  </div>
 </body>
 </html>
