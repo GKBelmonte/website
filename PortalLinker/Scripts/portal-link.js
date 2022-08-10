@@ -1,20 +1,24 @@
 $(document).ready(
-    function () {
-        let owData = [
-            {'x': -320, 'y': 107, 'z': -3885},
-            {'x':-248, 'y': 200, 'z': -3770}
-            ];
-        let neData = [
-            {'x':-41, 'y': 126, 'z': -484},
-            {'x':-29, 'y': 129, 'z': -473}
-            ];
+  function () {
+    let owData = [
+        {'x': -320, 'y': 107, 'z': -3885},
+        {'x':-248, 'y': 200, 'z': -3770}
+        ];
+    let neData = [
+        {'x':-41, 'y': 126, 'z': -484},
+        {'x':-29, 'y': 129, 'z': -473}
+        ];
 
-        for(let i = 0; i < owData.length; ++i)
-            AddPortalDirect("Overworld", owData[i]);
-        for(let i = 0; i < owData.length; ++i)
-            AddPortalDirect("Nether", neData[i]);
-        Refresh();
+    let portals = { 'overworld': owData, 'nether': neData };
+
+    ImportPortals(portals);
+
+    window.addEventListener('resize', function (event) {
+      Refresh();
     });
+
+    SetupDropJson();
+  });
     
 function AddPortal(ele, dim)
 {
@@ -119,6 +123,11 @@ class Portal {
         
         $(".portal-arrows").append(newArrow);
     }
+
+    toString() {
+        let l = this;
+        return `${l.dim}@(${l.x},${l.z},${l.y})`;
+    }
 }
 
 function Refresh()
@@ -181,25 +190,91 @@ function GetOtherDim(vec, currentDim)
     return res;
 }
 
-
 function CanConnect(l, r, dim)
 {
-    let res = { 'links': false, 'dist' : -1, 'target' : r };
-    let otherVec = GetOtherDim(l, dim);
-    let xdiff = Math.abs(otherVec.x - r.x);
-    let ydiff = Math.abs(otherVec.y - r.y);
-    let zdiff = Math.abs(otherVec.z - r.z);
-    res.dist = Math.sqrt( xdiff*xdiff + ydiff*ydiff + zdiff*zdiff);
-    if (xdiff > 128 || zdiff > 128)
-    {
-        return res;
-    }
+  let res = { 'links': false, 'dist' : -1, 'target' : r };
+  let otherVec = GetOtherDim(l, dim);
+  let xdiff = Math.abs(otherVec.x - r.x);
+  let ydiff = Math.abs(otherVec.y - r.y);
+  let zdiff = Math.abs(otherVec.z - r.z);
+  res.dist = Math.sqrt( xdiff*xdiff + ydiff*ydiff + zdiff*zdiff);
+  if (xdiff > 128 || zdiff > 128)
+  {
+      return res;
+  }
     
-    //if the source dim is overworld, we can't connect past 127
-    if(dim === "Overworld" && r.y > 127)
-    {
-        return res;
-    }
-    res.links = true;
-    return res;
+  // if the source dim is overworld, we can't connect past 127
+  // not a thing since 1.16
+  // if (dim === "Overworld" && r.y > 127) {
+  //   return res;
+  // }
+
+  console.log(`${l} connects to ${r} at distance ${res.dist} `)
+  res.links = true;
+  return res;
+}
+
+function ExportPortals(overworldPortals, netPortals) {
+
+  let portals = { "overworld": overworldPortals, "nether": netPortals }
+  let contents = JSON.stringify(
+    portals,
+    (k, v) => (k == "ui" || k == "hook" || k == "dim") ? undefined : v,
+    2);
+  let fileName = "portals.json";
+
+  SaveFile(fileName, contents);
+}
+
+function SaveFile(fileName, fileContents) {
+  let pp = document.createElement('a');
+  pp.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContents));
+  pp.setAttribute('download', fileName);
+  pp.click();
+}
+
+function ImportPortals(portals) {
+  let owData = portals.overworld;
+  let neData = portals.nether;
+  for (let i = 0; i < owData.length; ++i)
+    AddPortalDirect("Overworld", owData[i]);
+  for (let i = 0; i < neData.length; ++i)
+    AddPortalDirect("Nether", neData[i]);
+  Refresh();
+}
+
+function SetupDropJson() {
+  function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    files = evt.dataTransfer.files; // FileList object.
+
+    file = files[0];
+
+    ReadFile(file);
+  }
+
+  function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+  }
+
+  let reader;
+  function ReadFile(fileToRead) {
+    reader = new FileReader();
+    reader.readAsText(fileToRead);
+    $('.head').text(file.name.substr(0, file.name.length - 4));
+    reader.onload = LoadFile;
+  }
+
+  function LoadFile() {
+    let portals = JSON.parse(reader.result);
+    ImportPortals(portals);
+  }
+
+  let dropZone = document.querySelector('body');
+  dropZone.addEventListener('dragover', handleDragOver, false);
+  dropZone.addEventListener('drop', handleFileSelect, false);
 }
