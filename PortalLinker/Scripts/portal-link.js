@@ -18,6 +18,10 @@ $(document).ready(
     });
 
     SetupDropJson();
+
+    SetupMouseWheel();
+
+    //https://web.dev/drag-and-drop/ https://www.w3schools.com/html/html5_draganddrop.asp
   });
 
 function AddPortal(ele, dim) {
@@ -38,7 +42,7 @@ function AddPortal(ele, dim) {
 
 var g_Arrow = '<div style="position: absolute; top: {top}px; left: {left}px;" class="{dim}-div">'
   + '<span>{portaldist}</span>'
-  + '<svg class="portal-arrow portal-arrow-{dim} tooltipcontainer" width="306" height="100" >'
+  + '<svg class="portal-arrow portal-arrow-{dim} tooltipcontainer" width="1" height="1" >'
   + '     <defs>'
   + '         <marker id="{dim}-arrow" markerWidth="13" markerHeight="13" refX="2" refY="6" orient="auto">'
   + '             <path d="M2,2 L2,11 L10,6 L2,2"></path>'
@@ -49,20 +53,31 @@ var g_Arrow = '<div style="position: absolute; top: {top}px; left: {left}px;" cl
   + ' </svg>'
   + ' <span class="tooltiptext">{portaldist}</span></div>'
 
+
+function GetPortalInner(dim, vec) {
+
+  let otherDim = GetOtherDim(vec, dim);
+
+  return `<div class="portal-drag-control">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+              <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+            </svg>
+          </div>
+          <span class='portal-coord main-coord'>${vec.x},</span>
+          <span class='portal-coord main-coord'>${vec.z},</span>
+          <span class='portal-coord main-coord'>${vec.y}</span>
+          <span class='portal-coord portal-equiv'><sub>${otherDim.x}, ${otherDim.z}, ${otherDim.y}</sub></span>
+          <button onclick='DeletePortal(this, "${dim}")'>x</button>`;
+}
+
 function AddPortalDirect(dim, vec) {
   let root = dim === "Overworld"
     ? $('.portal-holder-overworld')
     : $('.portal-holder-nether');
 
-  let otherDim = GetOtherDim(vec, dim);
-
-  root.children().last().before('<div class="portal-entry" class="center-horizontal">'
-    + `<span class='portal-coord'>${vec.x},</span>`
-    + `<span class='portal-coord'>${vec.z},</span>`
-    + `<span class='portal-coord'>${vec.y}</span>`
-    + `<span class='portal-coord portal-equiv'><sub>${otherDim.x}, ${otherDim.z}, ${otherDim.y}</sub></span>`
-    + `<button onclick='DeletePortal(this, "${dim}")'>x</button>`
-    + `</div>`);
+  root.children().last().before(`<div class="portal-entry" class="center-horizontal" draggable="true" data-dim="${dim}">`
+    + GetPortalInner(dim, vec)
+    +`</div>`);
 
   root.children().last().prev().data('vec', vec);
 }
@@ -78,6 +93,7 @@ class Portal {
     this.x = vec.x;
     this.y = vec.y;
     this.z = vec.z;
+    this.vec = vec;
     this.hook = uiEle.offset();
     if (dim === "Overworld") {
       this.hook.left += uiEle.width();
@@ -94,16 +110,17 @@ class Portal {
   }
 
   Link(otherPortal, distance) {
-    let length = otherPortal.hook.left - this.hook.left;
+    let length = otherPortal.hook.left - this.hook.left - 10 ;
     let height = otherPortal.hook.top - this.hook.top;
     let left = this.hook.left;
     if (this.dim === "Nether") {
-      left += 5;
+      
       height += 10;
     }
     else {
       height -= 10;
     }
+
     let newArrow = g_Arrow
       .replace("{top}", this.hook.top)
       .replace("{left}", this.hook.left)
@@ -113,10 +130,14 @@ class Portal {
       .replace("{dim}", this.dim)
       .replace("{dim}", this.dim)
       .replace("{dim}", this.dim)
-      .replace("{portaldist}", distance.toFixed(0))
-      .replace("{portaldist}", distance.toFixed(0));
+      .replace("{portaldist}", distance.toFixed(1))
+      .replace("{portaldist}", distance.toFixed(1));
 
     $(".portal-arrows").append(newArrow);
+  }
+
+  Refresh() {
+    this.ui.html(GetPortalInner(this.dim, this.vec));
   }
 
   toString() {
@@ -137,13 +158,17 @@ function GetPortals() {
   let overworldPortalsUi = $('.portal-holder-overworld .portal-entry');
   let overworldPortals = [];
   for (let i = 0; i < overworldPortalsUi.length - 1; ++i) {
-    overworldPortals.push(new Portal($(overworldPortalsUi[i]), "Overworld"));
+    let portal = new Portal($(overworldPortalsUi[i]), "Overworld");
+    overworldPortals.push(portal);
+    portal.Refresh();
   }
 
   let netPortalsUi = $('.portal-holder-nether .portal-entry');
   let netPortals = [];
   for (let i = 0; i < netPortalsUi.length - 1; ++i) {
-    netPortals.push(new Portal($(netPortalsUi[i]), "Nether"));
+    let portal = new Portal($(netPortalsUi[i]), "Nether");
+    netPortals.push(portal);
+    portal.Refresh();
   }
   return { overworldPortals, netPortals };
 }
@@ -271,4 +296,35 @@ function SetupDropJson() {
   let dropZone = document.querySelector('body');
   dropZone.addEventListener('dragover', handleDragOver, false);
   dropZone.addEventListener('drop', handleFileSelect, false);
+}
+
+function SetupMouseWheel() {
+  $(document).on('mousewheel', 'span.portal-coord.main-coord', function (e) {
+
+    function GetParentAndIndex(target) {
+      let parent = $(e.currentTarget).parent();
+      let ix = parent.children().index(e.currentTarget) - 1;
+      let coord = 'x';
+      switch (ix) {
+        case 1: coord = 'z'; break;
+        case 2: coord = 'y'; break;
+      }
+      return [parent, coord];
+    }
+
+    let [parent, ix] = GetParentAndIndex(e.currentTarget);
+    let vec = parent.data('vec');
+
+    if (e.originalEvent.wheelDelta / 120 > 0) {
+      vec[ix] = vec[ix] + 1;
+    }
+    else if (e.originalEvent.wheelDelta / 120 < 0) {
+      vec[ix] = vec[ix] - 1;
+    }
+
+    e.currentTarget.textContent = `${vec[ix]},`;
+    parent.data('vec', vec);
+
+    Refresh();
+  });
 }
