@@ -1,0 +1,85 @@
+{
+  "_units": "Distances in height units (100 = the screen's height), speeds in units per second, times in seconds. Energy applies to challenge only; zen moves are free.",
+
+  "baseSpeed": {
+    "_about": "How fast the ground scrolls in each mood. Zen runs at these times zenMultiplier; challenge starts at these times challengeMultiplier and never goes past cap.",
+    "day": 36,
+    "twilight": 47,
+    "night": 58,
+    "zenMultiplier": 1.15,
+    "challengeMultiplier": 1.3,
+    "cap": 130
+  },
+
+  "speedIncrease": {
+    "_about": "Challenge only, picked in settings. Each loop adds this share of the starting speed, added rather than compounded: loop n runs at start x (1 + gain x (n - 1)), up to baseSpeed.cap.",
+    "default": "medium",
+    "perLoop": { "easy": 0.10, "medium": 0.13, "hard": 0.17 }
+  },
+
+  "energyPerMove": {
+    "_about": "Jumps and hovers cost the next price in their list each time before you land. A pulse within pulseRepeatWindowSeconds of the last one costs double the last price.",
+    "jumps": [10, 20, 40],
+    "hovers": [10, 20, 40],
+    "hoverPerSecond": 3,
+    "dash": 10,
+    "pulse": 20,
+    "pulseRepeatWindowSeconds": 3,
+    "pool": {
+      "_about": "Energy starts at start, which is also the lowest the max can go. It refills by refillShareOfMax of the max every second, except while hovering. A hit lowers the max by hitLowersMax.",
+      "start": 30,
+      "refillShareOfMax": 0.23,
+      "hitLowersMax": 4
+    }
+  },
+
+  "orbRate": {
+    "_about": "Each gap between stone groups gets an orb with chancePerGap, and that orb a neighbour with secondOrbChance. While the sun and moon meet, gaps get eclipseMultiplier tries.",
+    "chancePerGap": 0.55,
+    "secondOrbChance": 0.2,
+    "eclipseMultiplier": 2.5,
+    "height": [4, 19],
+    "raisesMax": 1,
+    "restores": 4,
+    "streakBonus": { "_about": "every this many orbs in a row without a hit restores this much extra energy, up to the max", "every": 7, "energy": 4 }
+  },
+
+  "jumpStrength": {
+    "_about": "A tap peaks around 9 high and a full hold around 24; both scale with jump squared over gravity.",
+    "jump": 87.3,
+    "airJump": 74,
+    "gravity": 320,
+    "holdGravity": 0.48,
+    "holdWindow": 0.417,
+    "jumpCut": 0.9,
+    "dashSpeed": 170
+  },
+
+  "obstacleDistance": {
+    "_about": "Seconds between stone groups and between birds, at the current speed. Challenge divides them by (1 + shrinkPerLoop x (n - 1)) each loop, never below minSeconds.",
+    "day": [1.9, 3.1],
+    "twilight": [1.4, 2.4],
+    "night": [1.05, 1.9],
+    "shrinkPerLoop": 0.1,
+    "minSeconds": 0.75,
+    "birds": { "swan": [3.5, 6], "raven": [2.2, 4] },
+    "pairSpacing": [5, 8],
+    "abyssClearance": 8
+  },
+
+  "obstacles": {
+    "stoneHeight": { "day": [4, 9], "twilight": [5, 11], "night": [5, 12], "perLoop": 0.5, "cap": 14 },
+    "stoneWidth": [2.2, 3.6],
+    "pairChance": { "day": 0, "twilight": 0.12, "night": 0.3, "perLoop": 0.08, "cap": 0.6 },
+    "pairHeightShare": 0.8,
+    "swan": { "fromDay": 2, "height": [7, 10], "radius": 2, "speedShare": 0.55 },
+    "raven": { "fromNight": 1, "lowChance": 0.5, "lowHeight": 3.6, "highHeight": [13, 16], "radius": 1.5, "speedShare": -0.5 },
+    "zenBirds": { "swansHarmless": true, "harmlessRavenChance": 0.8, "aloftHeight": [26, 34] },
+    "abyss": { "fromTwilight": 3, "chance": 0.45, "width": [12, 20], "fallDepth": 22 }
+  },
+
+  "moods": { "secondsPerMood": { "zen": 60, "challenge": 40 }, "blendSeconds": 6 },
+  "hits": { "runnerRadius": 2.1, "brokenSeconds": 0.9, "invulnerableSeconds": 2.4, "stoneForgiveness": 0.82, "birdForgiveness": 0.8 },
+  "pulse": { "reach": 20 },
+  "sky": { "sunUpShare": 0.6, "moonPeriodInMoods": 1.667 }
+}
