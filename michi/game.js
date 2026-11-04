@@ -183,9 +183,12 @@ const ZenRunner = (() => {
       return true;
     }
 
+    // The last jump, kept so a touch that turns out to be a swipe can take it back.
+    let undo = null;
     function press() {
-      s.held = true;
+      s.held = true; undo = null;
       if (s.broken > 0 || (s.mode !== 'play' && !s.autopilot)) return;
+      undo = { grounded: s.grounded, vy: s.vy, jumpsUsed: s.jumpsUsed, hovering: s.hovering, clock: s.clock };
       if (s.grounded) {
         if (!spend(C.jumps[0])) return;
         s.jumpsUsed = 1; s.vy = J.jump; s.grounded = false; s.holdT = 0; emit('jump', 0);
@@ -193,6 +196,16 @@ const ZenRunner = (() => {
         s.jumpsUsed++; s.vy = J.airJump; s.holdT = 0; s.hovering = false;
         ring(rx(), s.y + R, themeNow().pal.ink, 3); emit('jump', 1);
       }
+    }
+    // Undoes the last jump as if it never happened: its energy and its jump come back, and the
+    // runner returns to the ground, or to the fall it was on.
+    function takeBack() {
+      if (!undo || s.jumpsUsed === undo.jumpsUsed) return;
+      if (s.game === 'challenge' && !s.autopilot) s.energy = Math.min(s.maxEnergy, s.energy + C.jumps[undo.jumpsUsed]);
+      s.jumpsUsed = undo.jumpsUsed; s.hovering = undo.hovering; s.held = false;
+      if (undo.grounded) { s.y = 0; s.vy = 0; s.grounded = true; }
+      else s.vy = undo.vy - GRAVITY * (s.clock - undo.clock);
+      undo = null;
     }
     function release() {
       if (s.held && !s.grounded && s.vy > 0 && s.holdT < HOLD_WINDOW) s.vy *= J.jumpCut;
@@ -251,7 +264,7 @@ const ZenRunner = (() => {
     }
 
     function start(game = 'challenge', t = 0) {
-      Object.assign(s, { mode: 'play', autopilot: false, title: false, game, ts: B.moods.secondsPerMood[game], t, motes_: 0, streak: 0, best: 0, cleared: 0, themeIndex: -1, held: false, hovering: false, birdT: 2, energy: POOL.start, maxEnergy: POOL.start,
+      Object.assign(s, { mode: 'play', autopilot: false, title: false, game, ts: B.moods.secondsPerMood[game], t, motes_: 0, streak: 0, best: 0, cleared: 0, themeIndex: -1, held: false, hovering: false, birdT: 2, energy: POOL.start, maxEnergy: POOL.start, lives: B.hits.lives,
         jumpsUsed: 0, hoversUsed: 0, pulseTier: 0, pulseSince: 99 });
       s.birds.forEach(b => (b.fade = b.fade || 1));
       const cx = rx();
@@ -299,6 +312,8 @@ const ZenRunner = (() => {
       for (const a of s.abysses) if (a.x + a.w > cx - 4 && a.x < cx + 40) a.fade = a.fade || 1;
       for (const b of s.birds) if (b.x > cx - 4 && b.x < cx + 50) b.fade = b.fade || 1;
       emit('hit');
+      // Challenge has lives; losing the last ends the run, and the world drifts on behind it.
+      if (s.game === 'challenge' && --s.lives <= 0) { s.mode = 'over'; s.autopilot = true; }
     }
 
     function update(dt) {
@@ -590,6 +605,13 @@ const ZenRunner = (() => {
         text('tap to continue', W / 2, 51 * u, 1.8 * u, P.text, 0.55, { spacing: 0.3 * u });
         if (!s.settings) settingsLabel(P);
       }
+      if (s.mode === 'over' && !s.settings) {
+        ctx.fillStyle = rgba(P.sky1, 0.55); ctx.fillRect(0, 0, W, H);
+        text('終', W / 2, 36 * u, 12 * u, P.text, 0.85);
+        text(`${s.motes_} orbs · loop ${th.loop + 1}`, W / 2, 48 * u, 2 * u, P.text, 0.7, { spacing: 0.3 * u });
+        text('tap to return', W / 2, 54 * u, 1.6 * u, P.text, 0.5, { spacing: 0.3 * u });
+        settingsLabel(P);
+      }
       if (s.settings) drawSettings(P);
     }
 
@@ -704,6 +726,16 @@ const ZenRunner = (() => {
         ctx.beginPath(); ctx.moveTo(d0, y); ctx.lineTo(lerp(d0, d1, cool), y); ctx.stroke();
         text('波', d0 - 1 * u, y, 1.6 * u, P.text, 0.55, { align: 'right' });
 
+        // Above it: the lives left, one dash each, under 生.
+        const ly = y - 4 * u, n = B.hits.lives, seg = (d1 - d0) / n;
+        ctx.lineWidth = Math.max(1, 0.3 * u);
+        for (let i = 0; i < n; i++) {
+          ctx.strokeStyle = i < s.lives ? rgba(P.ink, 0.6) : rgba(P.ink, 0.12);
+          ctx.beginPath(); ctx.moveTo(d0 + i * seg + 0.4 * u, ly); ctx.lineTo(d0 + (i + 1) * seg - 0.4 * u, ly); ctx.stroke();
+        }
+        ctx.lineWidth = Math.max(1, 0.12 * u);
+        text('生', d0 - 1 * u, ly, 1.6 * u, P.text, 0.55, { align: 'right' });
+
         // Centred above the timeline: the energy left as a number and a bar against the max, lit while a jump is affordable.
         const e0 = W / 2 - 12 * u, e1 = W / 2 + 12 * u, ey = y - 4 * u, ready = s.energy >= C.jumps[0];
         ctx.strokeStyle = rgba(P.ink, 0.12); ctx.beginPath(); ctx.moveTo(e0, ey); ctx.lineTo(e1, ey); ctx.stroke();
@@ -752,7 +784,7 @@ const ZenRunner = (() => {
     }
 
     return {
-      state: s, resize, update, draw, press, release, dash, hover, endHover, pulse, start, pause, resume,
+      state: s, resize, update, draw, press, release, takeBack, dash, hover, endHover, pulse, start, pause, resume, toTitle,
       tapSettings, settingsLabelHit, toggleSettings() { s.settings = !s.settings; },
       togglePause() { s.mode === 'paused' ? resume() : pause(); },
       theme: () => themeNow().theme,

@@ -32,25 +32,41 @@
     if (e && game.settingsLabelHit(e.clientX, e.clientY)) return game.toggleSettings();
     if (s.mode === 'title') return game.start(e ? (e.clientX < innerWidth / 2 ? 'challenge' : 'zen') : ['challenge', 'zen'][s.pick]);
     if (s.mode === 'paused') return game.resume();
+    if (s.mode === 'over') return game.toTitle();
     game.press();
   }
 
-  // On touch screens a swipe down dashes, left hovers until the finger lifts, and right
-  // pulses. The press that starts a swipe still jumps first.
-  let swipe = null;
-  canvas.addEventListener('pointerdown', e => { e.preventDefault(); swipe = game.state.settings ? null : { x: e.clientX, y: e.clientY }; down(e); });
-  canvas.addEventListener('pointermove', e => {
-    if (!swipe) return;
-    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, far = 5 * game.unit();
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < far) return;
-    swipe = null;
-    if (Math.abs(dy) > Math.abs(dx)) { if (dy > 0) game.dash(); }
-    else if (dx > 0) game.pulse();
-    else game.hover();
+  // On touch screens every press jumps at once. A press that moves 5u within 150 ms is a swipe
+  // instead: its jump is taken back, then down dashes, back hovers until that finger lifts and
+  // forward pulses. Up keeps the jump, and a slower drift stays a hold.
+  const SWIPE_MS = 150, touches = new Map();
+  canvas.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const playing = game.state.mode === 'play' && !game.state.settings;
+    down(e);
+    if (playing) touches.set(e.pointerId, { x: e.clientX, y: e.clientY, t: e.timeStamp, open: true, hovering: false });
   });
-  addEventListener('pointerup', () => { swipe = null; game.endHover(); });
-  addEventListener('pointerup', () => game.release());
-  addEventListener('pointercancel', () => game.release());
+  canvas.addEventListener('pointermove', e => {
+    const t = touches.get(e.pointerId);
+    if (!t?.open) return;
+    if (e.timeStamp - t.t > SWIPE_MS) { t.open = false; return; }
+    const dx = e.clientX - t.x, dy = e.clientY - t.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 5 * game.unit()) return;
+    t.open = false;
+    if (-dy > Math.abs(dx)) return;
+    game.takeBack();
+    if (dy > Math.abs(dx)) game.dash();
+    else if (dx > 0) game.pulse();
+    else { game.hover(); t.hovering = true; }
+  });
+  function lift(e) {
+    const t = touches.get(e.pointerId);
+    touches.delete(e.pointerId);
+    if (t?.hovering) game.endHover();
+    if (!touches.size) game.release();
+  }
+  addEventListener('pointerup', lift);
+  addEventListener('pointercancel', lift);
   const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW', 'Enter'];
   addEventListener('keydown', e => {
     if (e.code === 'Escape') return game.toggleSettings();

@@ -79,7 +79,7 @@
   },
 
   "moods": { "secondsPerMood": { "zen": 60, "challenge": 40 }, "blendSeconds": 6 },
-  "hits": { "runnerRadius": 2.1, "brokenSeconds": 0.9, "invulnerableSeconds": 2.4, "stoneForgiveness": 0.82, "birdForgiveness": 0.8 },
+  "hits": { "lives": 7, "runnerRadius": 2.1, "brokenSeconds": 0.9, "invulnerableSeconds": 2.4, "stoneForgiveness": 0.82, "birdForgiveness": 0.8 },
   "pulse": { "reach": 20 },
   "sky": { "sunUpShare": 0.6, "moonPeriodInMoods": 1.667 }
 }
