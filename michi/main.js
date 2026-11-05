@@ -36,34 +36,32 @@
     game.press();
   }
 
-  // On touch screens every press jumps at once. A press that moves 5u within 150 ms is a swipe
-  // instead: its jump is taken back, then down dashes, back hovers until that finger lifts and
-  // forward pulses. Up keeps the jump, and a slower drift stays a hold.
-  const SWIPE_MS = 150, touches = new Map();
+  // Touch screens get three buttons (game.padAt): dash, pulse, and hover while held. A touch
+  // anywhere else jumps, as a click does. Each finger keeps its own button.
+  const MOVES = { dash: () => game.dash(), pulse: () => game.pulse(), hover: () => game.hover() };
+  const fingers = new Map();
   canvas.addEventListener('pointerdown', e => {
     e.preventDefault();
-    const playing = game.state.mode === 'play' && !game.state.settings;
-    down(e);
-    if (playing) touches.set(e.pointerId, { x: e.clientX, y: e.clientY, t: e.timeStamp, open: true, hovering: false });
-  });
-  canvas.addEventListener('pointermove', e => {
-    const t = touches.get(e.pointerId);
-    if (!t?.open) return;
-    if (e.timeStamp - t.t > SWIPE_MS) { t.open = false; return; }
-    const dx = e.clientX - t.x, dy = e.clientY - t.y;
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < 5 * game.unit()) return;
-    t.open = false;
-    if (-dy > Math.abs(dx)) return;
-    game.takeBack();
-    if (dy > Math.abs(dx)) game.dash();
-    else if (dx > 0) game.pulse();
-    else { game.hover(); t.hovering = true; }
+    const s = game.state;
+    if (e.pointerType === 'touch') {
+      s.touch = true;
+      // A touch that starts a run takes the screen, turned sideways where the browser allows it.
+      if (s.mode === 'title' && !s.settings && document.fullscreenEnabled && !document.fullscreenElement)
+        document.documentElement.requestFullscreen({ navigationUI: 'hide' }).then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
+    }
+    const button = s.touch && s.mode === 'play' && !s.settings ? game.padAt(e.clientX, e.clientY) : null;
+    fingers.set(e.pointerId, button || 'jump');
+    if (!button) return down(e);
+    audio.unlock();
+    s.padHeld[button] = true;
+    MOVES[button]();
   });
   function lift(e) {
-    const t = touches.get(e.pointerId);
-    touches.delete(e.pointerId);
-    if (t?.hovering) game.endHover();
-    if (!touches.size) game.release();
+    const button = fingers.get(e.pointerId);
+    fingers.delete(e.pointerId);
+    if (button) game.state.padHeld[button] = false;
+    if (button === 'hover') game.endHover();
+    if (![...fingers.values()].includes('jump')) game.release();
   }
   addEventListener('pointerup', lift);
   addEventListener('pointercancel', lift);

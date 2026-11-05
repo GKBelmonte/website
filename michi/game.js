@@ -63,7 +63,7 @@ const ZenRunner = (() => {
       autopilot: opts.autopilot ?? (opts.mode || 'title') === 'title',
       hud: opts.hud !== false, title: opts.title ?? (opts.mode || 'title') === 'title',
       game: opts.game || 'challenge', ts: B.moods.secondsPerMood[opts.game || 'challenge'], pick: 0,  // pick 0 = challenge, 1 = zen
-      settings: false, difficulty: B.speedIncrease.default,
+      settings: false, difficulty: B.speedIncrease.default, touch: false, padHeld: {},
       t: opts.startT || 0, clock: 0, dist: 0, next: 40,
       y: 0, vy: 0, grounded: true, jumpsUsed: 0, hoversUsed: 0, held: false, holdT: 0, autoRelease: 0,
       pulseTier: 0, pulseSince: 99,
@@ -183,12 +183,9 @@ const ZenRunner = (() => {
       return true;
     }
 
-    // The last jump, kept so a touch that turns out to be a swipe can take it back.
-    let undo = null;
     function press() {
-      s.held = true; undo = null;
+      s.held = true;
       if (s.broken > 0 || (s.mode !== 'play' && !s.autopilot)) return;
-      undo = { grounded: s.grounded, vy: s.vy, jumpsUsed: s.jumpsUsed, hovering: s.hovering, clock: s.clock };
       if (s.grounded) {
         if (!spend(C.jumps[0])) return;
         s.jumpsUsed = 1; s.vy = J.jump; s.grounded = false; s.holdT = 0; emit('jump', 0);
@@ -196,16 +193,6 @@ const ZenRunner = (() => {
         s.jumpsUsed++; s.vy = J.airJump; s.holdT = 0; s.hovering = false;
         ring(rx(), s.y + R, themeNow().pal.ink, 3); emit('jump', 1);
       }
-    }
-    // Undoes the last jump as if it never happened: its energy and its jump come back, and the
-    // runner returns to the ground, or to the fall it was on.
-    function takeBack() {
-      if (!undo || s.jumpsUsed === undo.jumpsUsed) return;
-      if (s.game === 'challenge' && !s.autopilot) s.energy = Math.min(s.maxEnergy, s.energy + C.jumps[undo.jumpsUsed]);
-      s.jumpsUsed = undo.jumpsUsed; s.hovering = undo.hovering; s.held = false;
-      if (undo.grounded) { s.y = 0; s.vy = 0; s.grounded = true; }
-      else s.vy = undo.vy - GRAVITY * (s.clock - undo.clock);
-      undo = null;
     }
     function release() {
       if (s.held && !s.grounded && s.vy > 0 && s.holdT < HOLD_WINDOW) s.vy *= J.jumpCut;
@@ -597,6 +584,7 @@ const ZenRunner = (() => {
       ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
 
       if (s.hud && s.mode !== 'title') drawHud(th, P);
+      if (s.touch && s.mode === 'play' && !s.settings) drawPad(P);
       if (s.title && !s.settings) drawTitle(P);
       if (s.mode === 'title' && s.hud) settingsLabel(P);
       if (s.mode === 'paused') {
@@ -613,6 +601,27 @@ const ZenRunner = (() => {
         settingsLabel(P);
       }
       if (s.settings) drawSettings(P);
+    }
+
+    // The touch pad, low on the right: jump in the middle, dash below, pulse forward, hover back.
+    // Touch buttons, thumb-sized (48 px across at least) however short the screen: 羽 hover on the
+    // back edge, 石 dash just above the energy bar, 波 pulse on the forward edge. A tap anywhere else jumps.
+    function padButtons() {
+      const r = Math.max(3 * u, 24), side = H - 10 * u - 2.4 * r;
+      return [['hover', '羽', 4 * u + r, side], ['dash', '石', W / 2, H - 10 * u - r], ['pulse', '波', W - 4 * u - r, side]].map(([name, glyph, x, y]) => ({ name, glyph, x, y, r }));
+    }
+    function padAt(x, y) {
+      const b = padButtons().find(b => Math.hypot(x - b.x, y - b.y) < b.r * 1.4);
+      return b ? b.name : null;
+    }
+    function drawPad(P) {
+      ctx.lineWidth = Math.max(1, 0.12 * u);
+      for (const { name, glyph, x, y, r } of padButtons()) {
+        const on = s.padHeld[name];
+        ctx.fillStyle = rgba(P.ink, on ? 0.14 : 0.04); ctx.strokeStyle = rgba(P.ink, on ? 0.45 : 0.18);
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); ctx.stroke();
+        text(glyph, x, y, r * 0.95, P.text, on ? 0.85 : 0.5);
+      }
     }
 
     function settingsLabel(P) {
@@ -779,12 +788,12 @@ const ZenRunner = (() => {
           text(label, x, 87.3 * u, 1.3 * u, P.text, 0.45, { spacing: 0.2 * u });
           if (s.pick === 0) text(String(cost), x, 89.6 * u, 1.1 * u, P.mote, 0.7);
         });
-        text('touch · tap to jump, swipe for the rest', W / 2, 92.5 * u, 1.1 * u, P.text, 0.3, { spacing: 0.2 * u });
+        text('touch · tap to jump · 羽 hover · 石 dash · 波 pulse', W / 2, 92.5 * u, 1.1 * u, P.text, 0.3, { spacing: 0.2 * u });
       }
     }
 
     return {
-      state: s, resize, update, draw, press, release, takeBack, dash, hover, endHover, pulse, start, pause, resume, toTitle,
+      state: s, resize, update, draw, press, release, dash, hover, endHover, pulse, start, pause, resume, toTitle, padAt,
       tapSettings, settingsLabelHit, toggleSettings() { s.settings = !s.settings; },
       togglePause() { s.mode === 'paused' ? resume() : pause(); },
       theme: () => themeNow().theme,
