@@ -18,13 +18,14 @@
   },
 
   "energyPerMove": {
-    "_about": "Jumps and hovers cost the next price in their list each time before you land. A pulse within pulseRepeatWindowSeconds of the last one costs double the last price.",
+    "_about": "Jumps and hovers cost the next price in their list each time before you land; a hover then drains hoverPerSecond while held, and in zen lasts at most zenHoverSeconds. A pulse costs pulse and one of pulseCharges charges; each new mood gives one charge back.",
     "jumps": [10, 20, 40],
     "hovers": [10, 20, 40],
-    "hoverPerSecond": 3,
+    "hoverPerSecond": 2.5,
+    "zenHoverSeconds": 5,
     "dash": 10,
-    "pulse": 20,
-    "pulseRepeatWindowSeconds": 3,
+    "pulse": 30,
+    "pulseCharges": 3,
     "pool": {
       "_about": "Energy starts at start, which is also the lowest the max can go. It refills by refillShareOfMax of the max every second, except while hovering. A hit lowers the max by hitLowersMax.",
       "start": 30,
@@ -34,10 +35,10 @@
   },
 
   "orbRate": {
-    "_about": "Each gap between stone groups gets an orb with chancePerGap, and that orb a neighbour with secondOrbChance. While the sun and moon meet, gaps get eclipseMultiplier tries.",
+    "_about": "Each gap between stone groups gets an orb with chancePerGap, and that orb a neighbour with secondOrbChance. Gaps that will reach you while the sun and moon meet get eclipseMultiplier tries, so the extra orbs arrive as the eclipse starts.",
     "chancePerGap": 0.55,
     "secondOrbChance": 0.2,
-    "eclipseMultiplier": 2.5,
+    "eclipseMultiplier": 3.5,
     "height": [4, 19],
     "raisesMax": 1,
     "restores": 4,
@@ -70,6 +71,7 @@
   "obstacles": {
     "stoneHeight": { "day": [4, 9], "twilight": [5, 11], "night": [5, 12], "perLoop": 0.5, "cap": 14 },
     "stoneWidth": [2.2, 3.6],
+    "stoneGrowth": { "_about": "From the fourth mood on, the largest stone grows by perMood each mood, up to max; both height and width.", "perMood": 0.04, "max": 0.16 },
     "pairChance": { "day": 0, "twilight": 0.12, "night": 0.3, "perLoop": 0.08, "cap": 0.6 },
     "pairHeightShare": 0.8,
     "swan": { "fromDay": 2, "height": [7, 10], "radius": 2, "speedShare": 0.55 },

@@ -13,6 +13,7 @@
   game.state.muted = store.get('kaze.muted') === '1';
   const savedLevel = store.get('michi.difficulty');
   if (savedLevel in balance.speedIncrease.perLoop) game.state.difficulty = savedLevel;
+  game.state.birdsAloft = store.get('michi.birds') === 'aloft';
   if (query.has('t')) game.start(query.get('mode') === 'zen' ? 'zen' : 'challenge', +query.get('t') || 0);
 
   const fit = () => game.resize(innerWidth, innerHeight, Math.min(devicePixelRatio || 1, 2));
@@ -22,6 +23,7 @@
   function save() {
     store.set('kaze.muted', game.state.muted ? '1' : '0');
     store.set('michi.difficulty', game.state.difficulty);
+    store.set('michi.birds', game.state.birdsAloft ? 'aloft' : 'low');
   }
   function toggleMute() { game.state.muted = !game.state.muted; save(); }
 

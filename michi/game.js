@@ -8,6 +8,7 @@ const ZenRunner = (() => {
   // Every balance number lives in balance.json, which create() takes as opts.balance.
   const SUN_LOW = hexRgb('#e2502f');
   const SUN_HIGH = hexRgb('#eeb032');
+  const ECLIPSE_DARK = hexRgb('#16131c');  // the moon's face and the sky's shade while it covers the sun
   const GROUND = 80;      // ground line, in height units from the top (100 units = canvas height)
   const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", Georgia, serif';
 
@@ -63,11 +64,11 @@ const ZenRunner = (() => {
       autopilot: opts.autopilot ?? (opts.mode || 'title') === 'title',
       hud: opts.hud !== false, title: opts.title ?? (opts.mode || 'title') === 'title',
       game: opts.game || 'challenge', ts: B.moods.secondsPerMood[opts.game || 'challenge'], pick: 0,  // pick 0 = challenge, 1 = zen
-      settings: false, difficulty: B.speedIncrease.default, touch: false, padHeld: {},
+      settings: false, difficulty: B.speedIncrease.default, birdsAloft: false, touch: false, padHeld: {},
       t: opts.startT || 0, clock: 0, dist: 0, next: 40,
       y: 0, vy: 0, grounded: true, jumpsUsed: 0, hoversUsed: 0, held: false, holdT: 0, autoRelease: 0,
-      pulseTier: 0, pulseSince: 99,
-      squash: 0, broken: 0, invuln: 0, hovering: false, conj: 0, conjOn: false, birdT: 2, energy: POOL.start, maxEnergy: POOL.start,
+      pulses: 0, hoverT: 0,
+      squash: 0, broken: 0, invuln: 0, hovering: false, conj: 0, conjOn: false, cover: 0, birdT: 2, energy: POOL.start, maxEnergy: POOL.start,
       stones: [], birds: [], abysses: [], motes: [], fx: [], particles: [], trail: [],
       motes_: 0, streak: 0, best: 0, cleared: 0, themeIndex: -1, muted: false,
     };
@@ -80,21 +81,22 @@ const ZenRunner = (() => {
     function fbm(x) { return noise(x) * 0.6 + noise(x * 2.1 + 17) * 0.28 + noise(x * 4.3 + 41) * 0.12; }
     // Challenge raises the base every loop, a rising see-saw: each day is easier
     // than the night before it, but harder than the day before that.
-    function tuned(T, challenge, level) {
-      const k = T.key, sp = B.baseSpeed, pc = O.pairChance, sh = O.stoneHeight;
-      const base = { ...T, speed: sp[k], gap: D[k], pair: pc[k], minH: sh[k][0], maxH: sh[k][1], birdGap: T.bird && D.birds[T.bird] };
+    function tuned(T, challenge, level, n) {
+      const k = T.key, sp = B.baseSpeed, pc = O.pairChance, sh = O.stoneHeight, sg = O.stoneGrowth;
+      const grow = 1 + Math.min(sg.max, sg.perMood * Math.max(0, n - 2));  // from the fourth mood on
+      const base = { ...T, speed: sp[k], gap: D[k], pair: pc[k], minH: sh[k][0], maxH: sh[k][1] * grow, maxW: O.stoneWidth[1] * grow, grow, birdGap: T.bird && D.birds[T.bird] };
       if (!challenge) return { ...base, speed: base.speed * sp.zenMultiplier };
       const ease = g => Math.max(D.minSeconds, g / (1 + D.shrinkPerLoop * level));
       return { ...base, speed: Math.min(sp.cap, base.speed * sp.challengeMultiplier * (1 + B.speedIncrease.perLoop[s.difficulty] * level)),
         gap: base.gap.map(ease), birdGap: base.birdGap && base.birdGap.map(ease),
         pair: Math.min(pc.cap, base.pair + pc.perLoop * level),
-        maxH: Math.min(sh.cap, base.maxH + sh.perLoop * level) };
+        maxH: Math.min(sh.cap, sh[k][1] + sh.perLoop * level) * grow };
     }
 
     function themeAt(t, ts, challenge) {
       const n = Math.floor(t / ts), local = t - n * ts, blend = B.moods.blendSeconds;
       const lv = i => (challenge ? Math.floor(i / 3) : 0);
-      const a = tuned(THEMES[n % 3], challenge, lv(n)), b = tuned(THEMES[(n + 1) % 3], challenge, lv(n + 1));
+      const a = tuned(THEMES[n % 3], challenge, lv(n), n), b = tuned(THEMES[(n + 1) % 3], challenge, lv(n + 1), n + 1);
       const k = smooth(clamp((local - (ts - blend)) / blend, 0, 1));
       const pal = { speed: lerp(a.speed, b.speed, k) };
       for (const c of COLORS) pal[c] = mix(a[c], b[c], k);
@@ -147,15 +149,16 @@ const ZenRunner = (() => {
     }
 
     // From the third twilight on, abysses open in some of twilight's gaps between stones.
+    const stoneShape = () => ['pillar', 'boulder', 'cairn', 'shard'][Math.floor(rand() * 4)];
     function spawn(T, speed, abysses) {
       const ob = B.orbRate, ab = O.abyss;
       const between = ([lo, hi]) => lerp(lo, hi, rand());
-      const x = s.next, w = between(O.stoneWidth);
-      s.stones.push({ x, w, h: lerp(T.minH, T.maxH, rand()) });
+      const x = s.next, w = lerp(O.stoneWidth[0], T.maxW, rand());
+      s.stones.push({ x, w, h: lerp(T.minH, T.maxH, rand()), shape: stoneShape(), seed: rand() });
       let end = x + w;
       if (rand() < T.pair) {
         const x2 = end + between(D.pairSpacing);
-        s.stones.push({ x: x2, w, h: lerp(T.minH, T.maxH * O.pairHeightShare, rand()) });
+        s.stones.push({ x: x2, w, h: lerp(T.minH, T.maxH * O.pairHeightShare, rand()), shape: stoneShape(), seed: rand() });
         end = x2 + w;
       }
       const gap = speed * lerp(T.gap[0], T.gap[1], rand());
@@ -163,8 +166,9 @@ const ZenRunner = (() => {
         const aw = between(ab.width);
         if (gap >= aw + 2 * D.abyssClearance) s.abysses.push({ x: end + (gap - aw) / 2, w: aw });
       }
-      // more orbs while the sun and moon meet; a fractional multiplier is a last pass taken by chance
-      for (let n = s.conjOn ? ob.eclipseMultiplier : 1; n > 0; n--) {
+      // more orbs where they will reach you while the sun and moon meet; a fractional multiplier is a last pass taken by chance
+      const eclipse = s.mode === 'play' && meetingAt(s.t + (end + gap / 2 - rx()) / speed) > 0;
+      for (let n = eclipse ? ob.eclipseMultiplier : 1; n > 0; n--) {
         if ((n < 1 && rand() >= n) || rand() >= ob.chancePerGap) continue;
         const mx = end + gap * (0.15 + rand() * 0.7);
         s.motes.push({ x: mx, h: between(ob.height), phase: rand() * 6.28, taken: 0 });
@@ -209,7 +213,7 @@ const ZenRunner = (() => {
     function hover() {
       if (s.mode !== 'play' || s.broken > 0 || s.grounded || s.hovering) return;
       if (s.hoversUsed >= C.hovers.length || !spend(C.hovers[s.hoversUsed])) return;
-      s.hoversUsed++; s.hovering = true; s.vy = 0; s.held = false;
+      s.hoversUsed++; s.hovering = true; s.hoverT = 0; s.vy = 0; s.held = false;
       ring(rx(), s.y + R, themeNow().pal.mote, 2); emit('hover');
     }
     function endHover() { s.hovering = false; }
@@ -218,9 +222,10 @@ const ZenRunner = (() => {
     // A pulse within the repeat window of the last one costs double the last price.
     function pulse() {
       if (s.mode !== 'play' || s.broken > 0) return;
-      const tier = s.pulseSince < C.pulseRepeatWindowSeconds ? s.pulseTier + 1 : 0;
-      if (!spend(C.pulse * 2 ** tier)) return;
-      s.pulseTier = tier; s.pulseSince = 0;
+      const counted = s.game === 'challenge' && !s.autopilot;
+      if (counted && s.pulses <= 0) return;
+      if (!spend(C.pulse)) return;
+      if (counted) s.pulses--;
       s.fx.push({ kind: 'pulse', y: s.y + R, life: 1 });
       pulseSweep(R);
       emit('pulse');
@@ -236,15 +241,16 @@ const ZenRunner = (() => {
 
     // Swans glide the same way you run, so they close in slowly; ravens fly at you.
     // Low ravens are jumped; high ones and swans are passed under, or cleared with a held jump.
-    // In zen the swans and four ravens in five fly out of reach and never collide.
+    // In zen the swans and four ravens in five fly out of reach and never collide; with the birds
+    // setting on aloft, every bird does, in either mode.
     function spawnBird(T, speed) {
-      const x = s.dist + W / u + 8, phase = rand() * 6.28, zen = s.game === 'zen';
+      const x = s.dist + W / u + 8, phase = rand() * 6.28, zen = s.game === 'zen', aloft = s.birdsAloft;
       const between = ([lo, hi]) => lerp(lo, hi, rand()), Z = O.zenBirds;
       if (T.bird === 'swan') {
-        const sw = O.swan, harmless = zen && Z.swansHarmless;
+        const sw = O.swan, harmless = aloft || (zen && Z.swansHarmless);
         s.birds.push({ kind: 'swan', x, h: harmless ? between(Z.aloftHeight) : between(sw.height), r: sw.radius, vx: speed * sw.speedShare, phase, harmless });
       } else {
-        const rv = O.raven, harmless = zen && rand() < Z.harmlessRavenChance;
+        const rv = O.raven, harmless = aloft || (zen && rand() < Z.harmlessRavenChance);
         const h = harmless ? between(Z.aloftHeight) : rand() < rv.lowChance ? rv.lowHeight : between(rv.highHeight);
         s.birds.push({ kind: 'raven', x, h, r: rv.radius, vx: speed * rv.speedShare, phase, harmless });
       }
@@ -252,7 +258,7 @@ const ZenRunner = (() => {
 
     function start(game = 'challenge', t = 0) {
       Object.assign(s, { mode: 'play', autopilot: false, title: false, game, ts: B.moods.secondsPerMood[game], t, motes_: 0, streak: 0, best: 0, cleared: 0, themeIndex: -1, held: false, hovering: false, birdT: 2, energy: POOL.start, maxEnergy: POOL.start, lives: B.hits.lives,
-        jumpsUsed: 0, hoversUsed: 0, pulseTier: 0, pulseSince: 99 });
+        jumpsUsed: 0, hoversUsed: 0, pulses: C.pulseCharges, hoverT: 0 });
       s.birds.forEach(b => (b.fade = b.fade || 1));
       const cx = rx();
       for (const st of s.stones) if (st.x < cx + 40) st.fade = st.fade || 1;
@@ -261,19 +267,20 @@ const ZenRunner = (() => {
     function toTitle() {
       Object.assign(s, { mode: 'title', autopilot: true, title: true, settings: false, t: 0, motes_: 0, streak: 0, best: 0, cleared: 0,
         themeIndex: -1, held: false, hovering: false, energy: POOL.start, maxEnergy: POOL.start, jumpsUsed: 0, hoversUsed: 0,
-        pulseTier: 0, pulseSince: 99, y: 0, vy: 0, grounded: true, broken: 0, invuln: 0 });
+        pulses: 0, hoverT: 0, y: 0, vy: 0, grounded: true, broken: 0, invuln: 0 });
       for (const o of [...s.stones, ...s.birds, ...s.abysses]) o.fade = o.fade || 1;
     }
 
     // The settings panel, in height units around the middle of the screen.
     const LEVELS = ['easy', 'medium', 'hard'];
-    const ROW = { sound: 44, difficulty: 52, restart: 60, close: 68 };
+    const ROW = { sound: 42, difficulty: 49, birds: 57, restart: 63, close: 70 };
     const levelX = i => W / 2 + (1 + i * 7.5) * u;
     const settingsLabelHit = (x, y) => x > W - 14 * u && y < 8 * u;
     function tapSettings(x, y) {
       const yu = y / u, near = row => Math.abs(yu - row) < 3;
       if (Math.abs(x - W / 2) > 20 * u || yu < 30 || yu > 72 || near(ROW.close)) { s.settings = false; return; }
       if (near(ROW.sound)) { s.muted = !s.muted; emit('settings'); }
+      else if (near(ROW.birds)) { s.birdsAloft = !s.birdsAloft; emit('settings'); }
       else if (near(ROW.difficulty)) {
         let pick = 0;
         LEVELS.forEach((_, i) => { if (Math.abs(x - levelX(i)) < Math.abs(x - levelX(pick))) pick = i; });
@@ -309,17 +316,15 @@ const ZenRunner = (() => {
       if (s.mode === 'play') s.t += dt;
       const th = themeNow(), T = th.theme, speed = th.pal.speed;
       if (s.mode === 'play' && th.index !== s.themeIndex) {
-        if (s.themeIndex >= 0) emit('theme', T);
+        if (s.themeIndex >= 0) { emit('theme', T); s.pulses = Math.min(C.pulseCharges, s.pulses + 1); }  // each new mood gives a pulse back
         s.themeIndex = th.index;
       }
       s.dist += speed * dt;
       s.squash *= Math.exp(-dt * 10);
       s.invuln = Math.max(0, s.invuln - dt);
       if (s.mode === 'play' && !s.hovering) s.energy = Math.min(s.maxEnergy, s.energy + POOL.refillShareOfMax * s.maxEnergy * dt);
-      s.pulseSince += dt;
 
-      const { sun, moon } = heavens();
-      const meeting = s.mode === 'play' && sun && moon && Math.hypot(sun.x - moon.x, sun.y - moon.y) < sun.r + moon.r;
+      const meeting = s.mode === 'play' && meetingAt(s.t) > 0;
       if (meeting && !s.conjOn) emit('conjunction');
       s.conjOn = !!meeting;
       s.conj = clamp(s.conj + (meeting ? 1 : -1) * dt / 1.5, 0, 1);
@@ -328,7 +333,9 @@ const ZenRunner = (() => {
         s.broken -= dt;
         if (s.broken <= 0) ring(rx(), R, th.pal.ink, 6);
       } else if (s.hovering) {
+        s.hoverT += dt;
         if (s.game === 'challenge' && !s.autopilot && (s.energy -= C.hoverPerSecond * dt) <= 0) { s.energy = 0; s.hovering = false; }
+        if (s.game === 'zen' && s.hoverT >= C.zenHoverSeconds) s.hovering = false;
       } else if (!s.grounded) {
         const g = s.held && s.vy > 0 && s.holdT < HOLD_WINDOW ? GRAVITY * HOLD : GRAVITY;
         const above = s.y >= 0;
@@ -460,6 +467,9 @@ const ZenRunner = (() => {
 
     function draw() {
       const th = themeNow(), P = th.pal, gy = GROUND * u;
+      // While the moon covers the sun the whole scene darkens with it; the runner, orbs and text keep their colour.
+      s.cover = s.mode === 'play' && !opts.sun ? meetingAt(s.t) : 0;
+      if (s.cover > 0) for (const c of ['sky0', 'sky1', 'far', 'mid', 'near', 'ground', 'particle']) P[c] = mix(P[c], ECLIPSE_DARK, 0.6 * s.cover);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.globalAlpha = 1;
 
@@ -472,8 +482,8 @@ const ZenRunner = (() => {
       if (opts.sun) orb(W * opts.sun.x, opts.sun.y * u, opts.sun.r * u, SUN_LOW, 0.22);
       else {
         const { sun, moon } = heavens();
-        if (moon) orb(moon.x, moon.y, moon.r, P.moon, 0.16);
-        if (sun) orb(sun.x, sun.y, sun.r, sun.col, 0.22);
+        if (sun) orb(sun.x, sun.y, sun.r, sun.col, 0.22 * (1 - s.cover * 0.8));
+        if (moon) drawMoon(moon, P, sun ? s.cover : 0);
         if (sun && moon && s.conj > 0) corona(sun, moon);
       }
 
@@ -529,11 +539,10 @@ const ZenRunner = (() => {
 
       ctx.fillStyle = rgba(P.ink);
       for (const st of s.stones) {
-        const x = (st.x - s.dist) * u, w = st.w * u, h = st.h * u, r = w / 2;
+        const x = (st.x - s.dist) * u, w = st.w * u, h = st.h * u;
         if (x > W || x + w < 0) continue;
         ctx.globalAlpha = st.fade ? clamp(st.fade, 0, 1) : 1;
-        ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x, gy - h + r);
-        ctx.arc(x + r, gy - h + r, r, Math.PI, 0); ctx.lineTo(x + w, gy); ctx.closePath(); ctx.fill();
+        drawStone(st.shape, x, gy, w, h, st.seed ?? 0.5);
       }
       for (const b of s.birds) {
         const x = (b.x - s.dist) * u;
@@ -605,10 +614,10 @@ const ZenRunner = (() => {
 
     // The touch pad, low on the right: jump in the middle, dash below, pulse forward, hover back.
     // Touch buttons, thumb-sized (48 px across at least) however short the screen: 羽 hover on the
-    // back edge, 石 dash just above the energy bar, 波 pulse on the forward edge. A tap anywhere else jumps.
+    // back edge, 石 dash low and just inside 波, 波 pulse on the forward edge. A tap anywhere else jumps.
     function padButtons() {
       const r = Math.max(3 * u, 24), side = H - 10 * u - 2.4 * r;
-      return [['hover', '羽', 4 * u + r, side], ['dash', '石', W / 2, H - 10 * u - r], ['pulse', '波', W - 4 * u - r, side]].map(([name, glyph, x, y]) => ({ name, glyph, x, y, r }));
+      return [['hover', '羽', 4 * u + r, side], ['dash', '石', W - 4 * u - 3.4 * r, H - 10 * u - r], ['pulse', '波', W - 4 * u - r, side]].map(([name, glyph, x, y]) => ({ name, glyph, x, y, r }));
     }
     function padAt(x, y) {
       const b = padButtons().find(b => Math.hypot(x - b.x, y - b.y) < b.r * 1.4);
@@ -641,6 +650,9 @@ const ZenRunner = (() => {
         if (on) { ctx.fillStyle = rgba(P.mote); ctx.beginPath(); ctx.arc(levelX(i), (ROW.difficulty + 2.4) * u, 0.35 * u, 0, 6.283); ctx.fill(); }
       });
       text('how fast challenge speeds up each loop', left, (ROW.difficulty + 3.6) * u, 1.1 * u, P.text, 0.35, { align: 'left', spacing: 0.15 * u });
+      row('birds', ROW.birds);
+      text(s.birdsAloft ? 'aloft' : 'in the way', right, ROW.birds * u, 1.8 * u, P.text, 0.9, { align: 'right', spacing: 0.3 * u });
+      text('aloft: every bird flies over you', left, (ROW.birds + 2.6) * u, 1.1 * u, P.text, 0.35, { align: 'left', spacing: 0.15 * u });
       row('restart', ROW.restart);
       text('back to the start', right, ROW.restart * u, 1.3 * u, P.text, 0.4, { align: 'right', spacing: 0.15 * u });
       text('close', W / 2, ROW.close * u, 1.6 * u, P.text, 0.5, { spacing: 0.4 * u });
@@ -675,17 +687,70 @@ const ZenRunner = (() => {
       }
     }
 
-    // Where the sun and moon are in the sky now, in pixels; either is null while below the horizon.
-    function heavens() {
-      const loopSeconds = s.ts * 3, ct = s.mode === 'title' ? loopSeconds * 0.15 : s.t;
+    // Where the sun and moon are in the sky at run time t, in pixels; either is null while below the horizon.
+    // Each pass of the moon shows the next of six phases, from full through new and back.
+    function heavens(t = s.t) {
+      const loopSeconds = s.ts * 3, ct = s.mode === 'title' ? loopSeconds * 0.15 : t;
       const sunK = (ct % loopSeconds) / loopSeconds / B.sky.sunUpShare;
       const moonT = ct - 2 * s.ts, moonP = s.ts * B.sky.moonPeriodInMoods;
       const moonK = moonT >= 0 ? (moonT % moonP) / (moonP / 2) : 1;
       const h = Math.sin(sunK * Math.PI);
       return {
         sun: sunK < 1 ? { x: W * lerp(0.06, 0.94, sunK), y: (92 - 70 * h) * u, r: 9 * u, col: mix(SUN_LOW, SUN_HIGH, h * h) } : null,
-        moon: moonK < 1 ? { x: W * lerp(0.1, 0.9, moonK), y: (92 - 76 * Math.sin(moonK * Math.PI)) * u, r: 5.5 * u } : null,
+        moon: moonK < 1 ? { x: W * lerp(0.1, 0.9, moonK), y: (92 - 76 * Math.sin(moonK * Math.PI)) * u, r: 9 * u, phase: (0.5 + Math.max(0, Math.floor(moonT / moonP)) / 6) % 1 } : null,
       };
+    }
+
+    // Stone shapes, each filling its w x h box on the ground: a standing pillar, a dome of a boulder,
+    // a cairn of three stacked stones, and a leaning shard.
+    function drawStone(shape, x, gy, w, h, k) {
+      ctx.beginPath();
+      if (shape === 'boulder') {
+        const peak = x + w * (0.35 + 0.3 * k);
+        ctx.moveTo(x, gy); ctx.bezierCurveTo(x, gy - h * 0.9, peak - w * 0.35, gy - h, peak, gy - h);
+        ctx.bezierCurveTo(peak + w * 0.4, gy - h, x + w, gy - h * 0.7, x + w, gy);
+      } else if (shape === 'cairn') {
+        const tiers = [[0, 0.42, 1], [0.42, 0.33, 0.78], [0.75, 0.25, 0.56]];
+        tiers.forEach(([at, th, sw], i) => {
+          const cx = x + w / 2 + (i === 1 ? 1 : i === 2 ? -1 : 0) * (k - 0.5) * w * 0.25, cy = gy - h * (at + th / 2);
+          ctx.moveTo(cx + (w * sw) / 2, cy); ctx.ellipse(cx, cy, (w * sw) / 2, (h * th) / 2 + 0.5, 0, 0, 6.283);
+        });
+      } else if (shape === 'shard') {
+        const lean = (k - 0.5) * w * 0.5;
+        ctx.moveTo(x, gy); ctx.lineTo(x + w * 0.22 + lean, gy - h * 0.9); ctx.lineTo(x + w * 0.5 + lean, gy - h);
+        ctx.lineTo(x + w * 0.78 + lean * 0.5, gy - h * 0.55); ctx.lineTo(x + w, gy);
+      } else {
+        const r = w / 2;
+        ctx.moveTo(x, gy); ctx.lineTo(x, gy - h + r); ctx.arc(x + r, gy - h + r, r, Math.PI, 0); ctx.lineTo(x + w, gy);
+      }
+      ctx.closePath(); ctx.fill();
+    }
+
+    // How much of the sun the moon covers at run time t, 0 to 1 (equal discs).
+    function meetingAt(t) {
+      const { sun, moon } = heavens(t);
+      if (!sun || !moon) return 0;
+      const d = Math.hypot(sun.x - moon.x, sun.y - moon.y) / sun.r;
+      return d >= 2 ? 0 : (2 * Math.acos(d / 2) - (d / 2) * Math.sqrt(4 - d * d)) / Math.PI;
+    }
+
+    // The moon at its phase (0 new, 0.5 full; waxing lit on the right). The unlit part is a faint disc;
+    // over the sun it darkens with cover, the share of the sun it hides, and its light fades out.
+    function drawMoon(m, P, cover) {
+      const k = Math.cos(m.phase * 6.283), lit = (1 - k) / 2, shine = lit * Math.max(0, 1 - cover / 0.6);
+      if (shine > 0.02) {
+        const glow = ctx.createRadialGradient(m.x, m.y, m.r * 0.8, m.x, m.y, m.r * 3.2);
+        glow.addColorStop(0, rgba(P.moon, 0.16 * shine)); glow.addColorStop(1, rgba(P.moon, 0));
+        ctx.fillStyle = glow; ctx.fillRect(m.x - m.r * 3.2, m.y - m.r * 3.2, m.r * 6.4, m.r * 6.4);
+      }
+      ctx.fillStyle = cover > 0 ? rgba(ECLIPSE_DARK, 0.3 + 0.65 * Math.min(1, cover * 1.5)) : rgba(P.moon, 0.1);
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, 6.283); ctx.fill();
+      if (shine <= 0.02) return;
+      ctx.save(); ctx.translate(m.x, m.y); if (m.phase > 0.5) ctx.scale(-1, 1);
+      ctx.beginPath(); ctx.arc(0, 0, m.r, -Math.PI / 2, Math.PI / 2);
+      ctx.ellipse(0, 0, Math.abs(k) * m.r, m.r, 0, Math.PI / 2, -Math.PI / 2, k > 0);
+      ctx.fillStyle = rgba(P.moon, 0.92 * Math.max(0, 1 - cover / 0.6)); ctx.fill();
+      ctx.restore();
     }
 
     // While the sun and moon meet: slowly turning rays and a ring around the pair.
@@ -727,12 +792,14 @@ const ZenRunner = (() => {
       text(th.theme.kanji, 5.5 * u, y, 2.2 * u, P.text, 0.55);
       text(s.game, 4 * u, y - 5.5 * u, 5.6 * u, P.text, 0.35, { align: 'left', spacing: 0.6 * u });
       if (challenge) {
-        // Bottom right: the pulse's repeat window under 波, full when a pulse is back at its base price.
-        const d0 = W - 28 * u, d1 = W - 4 * u, cool = Math.min(1, s.pulseSince / C.pulseRepeatWindowSeconds);
+        // Bottom right: the pulse charges left under 波, one dash each.
+        const d0 = W - 28 * u, d1 = W - 4 * u, pc = C.pulseCharges, pseg = (d1 - d0) / pc;
+        ctx.lineWidth = Math.max(1, 0.3 * u);
+        for (let i = 0; i < pc; i++) {
+          ctx.strokeStyle = i < s.pulses ? rgba(P.mote, 0.85) : rgba(P.ink, 0.12);
+          ctx.beginPath(); ctx.moveTo(d0 + i * pseg + 0.4 * u, y); ctx.lineTo(d0 + (i + 1) * pseg - 0.4 * u, y); ctx.stroke();
+        }
         ctx.lineWidth = Math.max(1, 0.12 * u);
-        ctx.strokeStyle = rgba(P.ink, 0.12); ctx.beginPath(); ctx.moveTo(d0, y); ctx.lineTo(d1, y); ctx.stroke();
-        ctx.strokeStyle = cool >= 1 ? rgba(P.mote, 0.85) : rgba(P.ink, 0.4);
-        ctx.beginPath(); ctx.moveTo(d0, y); ctx.lineTo(lerp(d0, d1, cool), y); ctx.stroke();
         text('波', d0 - 1 * u, y, 1.6 * u, P.text, 0.55, { align: 'right' });
 
         // Above it: the lives left, one dash each, under 生.
@@ -753,6 +820,15 @@ const ZenRunner = (() => {
         ctx.beginPath(); ctx.moveTo(e0, ey); ctx.lineTo(lerp(e0, e1, s.energy / s.maxEnergy), ey); ctx.stroke();
         text(String(Math.floor(s.energy)), e0 - 1.2 * u, ey, 3 * u, P.text, 0.6, { align: 'right' });
         text(String(s.maxEnergy), e1 + 1.2 * u, ey, 3 * u, P.text, 0.35, { align: 'left' });
+      }
+      if (!challenge && s.hovering) {
+        // Zen: while hovering, the time left of its zenHoverSeconds, centred above the timeline.
+        const e0 = W / 2 - 12 * u, e1 = W / 2 + 12 * u, ey = y - 4 * u, left = Math.max(0, 1 - s.hoverT / C.zenHoverSeconds);
+        ctx.lineWidth = Math.max(1, 0.12 * u);
+        ctx.strokeStyle = rgba(P.ink, 0.12); ctx.beginPath(); ctx.moveTo(e0, ey); ctx.lineTo(e1, ey); ctx.stroke();
+        ctx.lineWidth = Math.max(1, 0.3 * u); ctx.strokeStyle = rgba(P.mote, 0.85);
+        ctx.beginPath(); ctx.moveTo(e0, ey); ctx.lineTo(lerp(e0, e1, left), ey); ctx.stroke();
+        text('羽', e0 - 1.2 * u, ey, 2 * u, P.text, 0.55, { align: 'right' });
       }
       ctx.lineWidth = Math.max(1, 0.12 * u);
       if (challenge) text(`loop ${th.loop + 1}`, x1, y - 2 * u, 1.4 * u, P.text, 0.4, { align: 'right', spacing: 0.15 * u });
@@ -780,7 +856,7 @@ const ZenRunner = (() => {
         text('tap one · or ← → and space', W / 2, 96 * u, 1.5 * u, P.text, a, { spacing: 0.4 * u });
 
         // The moves, with their energy cost while challenge is picked.
-        const moves = [['↑', 'jump', C.jumps.join(' · ')], ['↓', 'dash', C.dash], ['←', 'hover', C.hovers.join(' · ')], ['→', 'pulse', `${C.pulse} ×2`]];
+        const moves = [['↑', 'jump', C.jumps.join(' · ')], ['↓', 'dash', C.dash], ['←', 'hover', C.hovers.join(' · ')], ['→', 'pulse', `${C.pulse} · ${C.pulseCharges} 波`]];
         const step = Math.min(13 * u, W / 4.6);
         moves.forEach(([key, label, cost], i) => {
           const x = W / 2 + (i - 1.5) * step;
