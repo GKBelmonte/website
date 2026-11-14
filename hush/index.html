@@ -52,7 +52,11 @@
   const app = document.getElementById('app');
   const saved = JSON.parse(localStorage.getItem('hush') || 'null');
   const setup = saved || { teams: [{ name: 'Red', players: [] }, { name: 'Blue', players: [] }], minutes: 2, banned: 5 };
-  const game = { scores: [0, 0], turn: 0, deck: [], card: null, endsAt: 0, tick: 0, tally: null };
+  // The running game is saved on every change, so a reload picks up where it left off, mid-turn included.
+  // deck and card hold indexes into CARDS.
+  const game = JSON.parse(localStorage.getItem('hush-game') || 'null')
+    || { screen: 'setup', scores: [0, 0], turn: 0, deck: [], card: 0, endsAt: 0, tally: null };
+  let tick = 0;
 
   const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const save = () => localStorage.setItem('hush', JSON.stringify(setup));
@@ -62,7 +66,7 @@
 
   function draw() {
     if (!game.deck.length) {
-      game.deck = CARDS.slice();
+      game.deck = CARDS.map((_, i) => i);
       for (let i = game.deck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [game.deck[i], game.deck[j]] = [game.deck[j], game.deck[i]];
@@ -104,12 +108,13 @@
   }
 
   function showTurn() {
+    const card = CARDS[game.card];
     app.innerHTML = `<div class="row spread team-${team()}">
         <span><span class="team">${esc(setup.teams[team()].name)}</span> · ${esc(describer())}</span>
         <span class="timer" id="timer"></span>
       </div>
-      <div class="card"><div class="word">${esc(game.card.word)}</div>
-        <ul>${game.card.banned.slice(0, setup.banned).map(b => `<li>${esc(b)}</li>`).join('')}</ul></div>
+      <div class="card"><div class="word">${esc(card.word)}</div>
+        <ul>${card.banned.slice(0, setup.banned).map(b => `<li>${esc(b)}</li>`).join('')}</ul></div>
       <div class="grow"></div>
       <div class="actions">
         <button class="got" data-mark="got">Got it · +1</button>
@@ -127,18 +132,28 @@
     el.classList.toggle('low', left <= 10);
   }
 
+  function show(screen) {
+    game.screen = screen;
+    localStorage.setItem('hush-game', JSON.stringify(game));
+    ({ setup: showSetup, ready: showReady, turn: showTurn })[screen]();
+  }
+
+  function runTimer() {
+    tick = setInterval(() => {
+      if (Date.now() < game.endsAt) return showClock();
+      clearInterval(tick);
+      navigator.vibrate?.([300, 100, 300]);
+      game.turn++;
+      show('ready');
+    }, 250);
+  }
+
   function startTurn() {
     game.tally = { got: 0, buzz: 0, skip: 0 };
     game.endsAt = Date.now() + setup.minutes * 60000;
     draw();
-    showTurn();
-    game.tick = setInterval(() => {
-      if (Date.now() < game.endsAt) return showClock();
-      clearInterval(game.tick);
-      navigator.vibrate?.([300, 100, 300]);
-      game.turn++;
-      showReady();
-    }, 250);
+    show('turn');
+    runTimer();
   }
 
   app.addEventListener('submit', e => {
@@ -166,20 +181,21 @@
       save(); showSetup();
     } else if (b.id === 'start') {
       Object.assign(game, { scores: [0, 0], turn: 0, tally: null });
-      showReady();
+      show('ready');
     } else if (b.id === 'go') {
       startTurn();
     } else if (b.id === 'new') {
-      showSetup();
+      show('setup');
     } else if (d.mark) {
       game.tally[d.mark]++;
       if (d.mark === 'got') game.scores[team()]++;
       if (d.mark === 'buzz') game.scores[1 - team()]++;
-      draw(); showTurn();
+      draw(); show('turn');
     }
   });
 
-  showSetup();
+  show(game.screen);
+  if (game.screen === 'turn') runTimer();
 })();
 </script>
 </body>
