@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>hush — a forbidden-words party game</title>
+<style>
+  :root { --paper: #f7f4ed; --ink: #2b2a27; --soft: #8a857a; --line: #dcd6c8; --a: #c0553a; --b: #3a6ea5; --good: #4c8a55; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--paper); color: var(--ink); font: 17px/1.4 system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+  main { max-width: 30rem; margin: 0 auto; padding: 1.2rem 1rem 2rem; min-height: 100dvh; display: flex; flex-direction: column; gap: 1rem; }
+  h1 { margin: 0; font-size: 1.6rem; letter-spacing: .15em; font-weight: 600; }
+  h1 small { display: block; font-size: .8rem; letter-spacing: 0; font-weight: 400; color: var(--soft); }
+  h2 { margin: 0 0 .4rem; font-size: 1rem; }
+  button { font: inherit; color: inherit; background: none; border: 1.5px solid var(--ink); border-radius: .6rem; padding: .7rem 1rem; cursor: pointer; }
+  button:disabled { opacity: .35; cursor: default; }
+  button.primary { background: var(--ink); color: var(--paper); }
+  input { font: inherit; color: inherit; background: #fff; border: 1.5px solid var(--line); border-radius: .6rem; padding: .6rem .7rem; min-width: 0; flex: 1; }
+  .panel { border: 1.5px solid var(--line); border-radius: .8rem; padding: .8rem; background: #fffdf8; }
+  .row { display: flex; gap: .5rem; align-items: center; }
+  .spread { justify-content: space-between; }
+  .team-0 { --team: var(--a); } .team-1 { --team: var(--b); }
+  .team { color: var(--team); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; min-height: 2rem; }
+  .chip { border: 1.5px solid var(--team); border-radius: 2rem; padding: .2rem .4rem .2rem .7rem; font-size: .95rem; }
+  .chip button { border: 0; padding: 0 .3rem; color: var(--soft); }
+  .stepper button { width: 2.6rem; padding: .4rem 0; }
+  .stepper b { min-width: 4.5rem; text-align: center; }
+  .scores { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; text-align: center; }
+  .scores .panel { border-color: var(--team); }
+  .scores b { display: block; font-size: 2rem; line-height: 1.1; }
+  .grow { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1rem; text-align: center; }
+  .who { font-size: 1.5rem; }
+  .timer { font-size: 2.2rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .timer.low { color: var(--a); }
+  .card { border: 2px solid var(--ink); border-radius: 1rem; background: #fff; overflow: hidden; text-align: center; }
+  .card .word { background: var(--ink); color: var(--paper); font-size: 1.9rem; font-weight: 600; padding: 1rem .5rem; }
+  .card ul { list-style: none; margin: 0; padding: .6rem 0; }
+  .card li { font-size: 1.35rem; padding: .3rem 0; text-transform: lowercase; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .actions button { padding: 1.1rem .5rem; font-weight: 600; }
+  .got { grid-column: 1 / -1; background: var(--good); border-color: var(--good); color: #fff; }
+  .buzz { background: var(--a); border-color: var(--a); color: #fff; }
+  .note { color: var(--soft); font-size: .9rem; margin: 0; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="cards.js"></script>
+<script>
+(() => {
+  const app = document.getElementById('app');
+  const saved = JSON.parse(localStorage.getItem('hush') || 'null');
+  const setup = saved || { teams: [{ name: 'Red', players: [] }, { name: 'Blue', players: [] }], minutes: 2, banned: 5 };
+  const game = { scores: [0, 0], turn: 0, deck: [], card: null, endsAt: 0, tick: 0, tally: null };
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const save = () => localStorage.setItem('hush', JSON.stringify(setup));
+  const team = () => game.turn % 2;
+  // Teams alternate turns; inside a team the describer rotates, so unequal teams just cycle at their own pace.
+  const describer = () => { const p = setup.teams[team()].players; return p[(game.turn >> 1) % p.length]; };
+
+  function draw() {
+    if (!game.deck.length) {
+      game.deck = CARDS.slice();
+      for (let i = game.deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [game.deck[i], game.deck[j]] = [game.deck[j], game.deck[i]];
+      }
+    }
+    game.card = game.deck.pop();
+  }
+
+  const scoreboard = () => `<div class="scores">${setup.teams.map((t, i) =>
+    `<div class="panel team-${i}"><span class="team">${esc(t.name)}</span><b>${game.scores[i]}</b></div>`).join('')}</div>`;
+
+  function showSetup() {
+    const stepper = (key, label, text) => `<div class="row spread"><span>${label}</span>
+      <span class="row stepper"><button data-step="${key}" data-by="-1">−</button><b>${text}</b><button data-step="${key}" data-by="1">+</button></span></div>`;
+    app.innerHTML = `<h1>HUSH<small>Describe the word. Say none of the forbidden ones.</small></h1>
+      ${setup.teams.map((t, i) => `<div class="panel team-${i}">
+        <h2 class="team">${esc(t.name)} team · ${t.players.length}</h2>
+        <div class="chips">${t.players.map((p, j) => `<span class="chip">${esc(p)}<button data-drop="${i},${j}" aria-label="Remove ${esc(p)}">×</button></span>`).join('')}</div>
+        <form class="row" data-team="${i}"><input name="player" placeholder="Add a player" maxlength="20" autocomplete="off"><button>Add</button></form>
+      </div>`).join('')}
+      <div class="panel" style="display:grid;gap:.6rem">
+        ${stepper('minutes', 'Time per turn', setup.minutes + ' min')}
+        ${stepper('banned', 'Forbidden words', setup.banned)}
+      </div>
+      <button class="primary" id="start" ${setup.teams.every(t => t.players.length) ? '' : 'disabled'}>Start game</button>
+      <p class="note">Teams can be different sizes. Each team needs at least one player. ${CARDS.length} cards.</p>`;
+  }
+
+  function showReady() {
+    const t = game.tally;
+    app.innerHTML = `${scoreboard()}
+      <div class="grow team-${team()}">
+        ${t ? `<p class="note">Last turn: ${t.got} guessed, ${t.buzz} buzzed, ${t.skip} skipped.</p>` : ''}
+        <div><span class="team">${esc(setup.teams[team()].name)} team</span><div class="who">${esc(describer())} describes</div></div>
+        <p class="note">Hand the phone to ${esc(describer())}. Someone from the other team watches the card.</p>
+      </div>
+      <button class="primary" id="go">Start turn · ${setup.minutes} min</button>
+      <button id="new">New game</button>`;
+  }
+
+  function showTurn() {
+    app.innerHTML = `<div class="row spread team-${team()}">
+        <span><span class="team">${esc(setup.teams[team()].name)}</span> · ${esc(describer())}</span>
+        <span class="timer" id="timer"></span>
+      </div>
+      <div class="card"><div class="word">${esc(game.card.word)}</div>
+        <ul>${game.card.banned.slice(0, setup.banned).map(b => `<li>${esc(b)}</li>`).join('')}</ul></div>
+      <div class="grow"></div>
+      <div class="actions">
+        <button class="got" data-mark="got">Got it · +1</button>
+        <button class="buzz" data-mark="buzz">Buzz · +1 ${esc(setup.teams[1 - team()].name)}</button>
+        <button data-mark="skip">Skip</button>
+      </div>`;
+    showClock();
+  }
+
+  // Only the clock is redrawn on the tick: replacing the buttons mid-press would swallow the tap.
+  function showClock() {
+    const left = Math.max(0, Math.ceil((game.endsAt - Date.now()) / 1000));
+    const el = document.getElementById('timer');
+    el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+    el.classList.toggle('low', left <= 10);
+  }
+
+  function startTurn() {
+    game.tally = { got: 0, buzz: 0, skip: 0 };
+    game.endsAt = Date.now() + setup.minutes * 60000;
+    draw();
+    showTurn();
+    game.tick = setInterval(() => {
+      if (Date.now() < game.endsAt) return showClock();
+      clearInterval(game.tick);
+      navigator.vibrate?.([300, 100, 300]);
+      game.turn++;
+      showReady();
+    }, 250);
+  }
+
+  app.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = e.target.player.value.trim();
+    if (!name) return;
+    setup.teams[e.target.dataset.team].players.push(name);
+    save(); showSetup();
+    app.querySelector(`form[data-team="${e.target.dataset.team}"] input`).focus();
+  });
+
+  app.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const d = b.dataset;
+    if (d.drop) {
+      const [i, j] = d.drop.split(',');
+      setup.teams[i].players.splice(j, 1);
+      save(); showSetup();
+    } else if (d.step === 'minutes') {
+      setup.minutes = Math.min(5, Math.max(0.5, setup.minutes + d.by * 0.5));
+      save(); showSetup();
+    } else if (d.step === 'banned') {
+      setup.banned = Math.min(7, Math.max(5, setup.banned + +d.by));
+      save(); showSetup();
+    } else if (b.id === 'start') {
+      Object.assign(game, { scores: [0, 0], turn: 0, tally: null });
+      showReady();
+    } else if (b.id === 'go') {
+      startTurn();
+    } else if (b.id === 'new') {
+      showSetup();
+    } else if (d.mark) {
+      game.tally[d.mark]++;
+      if (d.mark === 'got') game.scores[team()]++;
+      if (d.mark === 'buzz') game.scores[1 - team()]++;
+      draw(); showTurn();
+    }
+  });
+
+  showSetup();
+})();
+</script>
+</body>
+</html>
